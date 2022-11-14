@@ -26,9 +26,9 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = DarkBlue,
-    secondary = LightBlue,
-    tertiary = Light,
+    primary = LightBlue,
+    secondary = Blue20,
+    tertiary = Grey20,
     background = Light
 
     /* Other default colors to override
@@ -62,7 +62,7 @@ fun NotificationPlannerTheme(
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            (view.context as Activity).window.statusBarColor = colorScheme.background.toArgb()
+            (view.context as Activity).window.statusBarColor = colorScheme.tertiary.toArgb()
             ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
         }
     }

@@ -15,7 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.notificationplanner.components.NotificationCard
+import com.example.notificationplanner.ui.components.NotificationCard
 
 import com.example.notificationplanner.ui.theme.NotificationPlannerTheme
 
@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
                             horizontalAlignment = Alignment.CenterHorizontally
 
                         ) {
-                            item() { NotificationCard() }
+                            items(1) { NotificationCard() }
                         }
                     }
                 }

@@ -2,7 +2,6 @@
 
 package com.example.notificationplanner
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,10 +10,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.notificationplanner.ui.components.BottomSheetModal
 import com.example.notificationplanner.ui.components.NotificationCard
 
 import com.example.notificationplanner.ui.theme.NotificationPlannerTheme
@@ -26,6 +30,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             NotificationPlannerTheme {
+                var dialogIsOpen by remember { mutableStateOf(false) }
+
                 Surface(
                     modifier = Modifier
                         .fillMaxSize(),
@@ -36,8 +42,9 @@ class MainActivity : ComponentActivity() {
                             FloatingActionButton(
                                 containerColor = MaterialTheme.colorScheme.tertiary,
                                 onClick = {
-                                    // ModalDrawer
-                                    startActivity(Intent(this@MainActivity, SecondActivity::class.java))
+                                    dialogIsOpen = true
+
+                                    //startActivity(Intent(this@MainActivity, SecondActivity::class.java))
                                 },
                             ) {
                                 Icon(
@@ -70,6 +77,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             items(1) { NotificationCard() }
                         }
+                        if (dialogIsOpen) BottomSheetModal(onClose = {dialogIsOpen = false})
                     }
                 }
             }

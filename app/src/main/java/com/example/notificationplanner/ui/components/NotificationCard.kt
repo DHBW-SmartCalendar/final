@@ -69,7 +69,8 @@ fun NotificationCard(
 
         }
         Divider(thickness = 1.dp, modifier = Modifier.padding(start = 10.dp, end = 10.dp))
-        LazyRow {
+        LazyRow (
+                ){
             item {
                 Image(
                     painter = painterResource(id = R.drawable.wecker_png), contentDescription = "alarmClock",

@@ -18,8 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.notificationplanner.ui.components.BottomSheetModal
 import com.example.notificationplanner.ui.components.NotificationCard
+import com.example.notificationplanner.ui.components.NotificationCreationModal
+import com.example.notificationplanner.ui.form.WeatherForm
 
 import com.example.notificationplanner.ui.theme.NotificationPlannerTheme
 
@@ -77,7 +78,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             items(1) { NotificationCard() }
                         }
-                        if (dialogIsOpen) BottomSheetModal(onClose = {dialogIsOpen = false})
+                        if (dialogIsOpen) NotificationCreationModal(content = { WeatherForm() }, onClose = { dialogIsOpen = false})
                     }
                 }
             }

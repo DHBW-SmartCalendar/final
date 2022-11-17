@@ -15,11 +15,12 @@ import androidx.compose.ui.window.DialogProperties
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun BottomSheetModal(
-    onClose: () -> Unit
+fun NotificationCreationModal(
+    onClose: () -> Unit,
+    content: @Composable () -> Unit
 ) {
     Dialog(
-        onDismissRequest = { /*TODO*/ },
+        onDismissRequest = { onClose() },
         properties = DialogProperties(usePlatformDefaultWidth = false),
         content = {
             Box(
@@ -27,7 +28,7 @@ fun BottomSheetModal(
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
             ) {
-                Text(text = "Test")
+
                 Button(onClick = { onClose() }) {
                     Text(text = "Close")
                 }

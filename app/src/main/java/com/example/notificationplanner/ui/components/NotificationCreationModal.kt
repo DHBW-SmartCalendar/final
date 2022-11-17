@@ -2,14 +2,15 @@ package com.example.notificationplanner.ui.components
 
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
@@ -23,19 +24,33 @@ fun NotificationCreationModal(
         onDismissRequest = { onClose() },
         properties = DialogProperties(usePlatformDefaultWidth = false),
         content = {
-            Box(
+            Column(
+
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
             ) {
-
-                Button(onClick = { onClose() }) {
-                    Text(text = "Close")
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp, end = 10.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    IconButton(onClick = { onClose() }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = null,
+                            tint = Color.Black
+                        )
+                    }
                 }
+                Row(
+                    modifier = Modifier.padding(start = 10.dp)
+                ) {
+                    Text(text = "Create", style = MaterialTheme.typography.titleLarge)
+                }
+                content()
             }
-
         }
-
-
     )
 }

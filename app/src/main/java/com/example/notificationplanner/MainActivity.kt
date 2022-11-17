@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.notificationplanner.ui.components.NotificationCard
 import com.example.notificationplanner.ui.components.NotificationCreationModal
@@ -78,7 +79,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             items(1) { NotificationCard() }
                         }
-                        if (dialogIsOpen) NotificationCreationModal(content = { WeatherForm() }, onClose = { dialogIsOpen = false})
+                        if (dialogIsOpen) NotificationCreationModal(content = { WeatherForm() }, onClose = { dialogIsOpen = false })
                     }
                 }
             }

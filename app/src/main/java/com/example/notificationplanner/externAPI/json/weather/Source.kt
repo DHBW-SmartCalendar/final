@@ -1,4 +1,4 @@
-package com.example.notificationplanner.data.weather
+package com.example.notificationplanner.externAPI.json.weather
 
 data class Source(
     val distance: Double,

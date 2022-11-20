@@ -1,24 +1,38 @@
 package com.example.notificationplanner.ui.components
 
-import androidx.compose.foundation.Image
+import android.content.Context
+import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.notificationplanner.R
+import com.example.notificationplanner.data.NotificationConfig
+import com.example.notificationplanner.data.db.NotificationRepository
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.time.LocalTime
 
-@Preview
+
 @Composable
 fun NotificationCard(
     modifier: Modifier = Modifier,
-    title: String = "Title"
+    notificationConfig: NotificationConfig,
+    onEditRequest: () -> Unit
 ) {
+    val context = LocalContext.current
 
     ElevatedCard(
         modifier = Modifier
@@ -33,14 +47,18 @@ fun NotificationCard(
             hoveredElevation = 25.dp
         )
     ) {
-        var checkedValue by remember { mutableStateOf(false) }
+
+        val configState by remember { mutableStateOf(notificationConfig) }
+        var isChecked  by remember { mutableStateOf(notificationConfig.isActive) }
+
+
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
             Text(
-                text = title,
+                text = configState.type?.description!!,
                 modifier = Modifier
                     .padding(20.dp)
                     .weight(4f),
@@ -48,10 +66,11 @@ fun NotificationCard(
                 color = Color.Black
             )
             Switch(
-                checked = checkedValue,
+                checked = isChecked,
                 onCheckedChange = {
-                    checkedValue = it
-                    println(it)
+                    isChecked = it
+                    configState.isActive = isChecked
+                    saveActivation(configState, context)
                 },
                 modifier = Modifier
                     .padding(5.dp)
@@ -69,26 +88,57 @@ fun NotificationCard(
 
         }
         Divider(thickness = 1.dp, modifier = Modifier.padding(start = 10.dp, end = 10.dp))
-        LazyRow (
-                ){
+        LazyRow(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Bottom
+
+
+        ) {
             item {
-                Image(
-                    painter = painterResource(id = R.drawable.wecker_png), contentDescription = "alarmClock",
-                    modifier = Modifier
-                        .size(55.dp, 55.dp)
-                        .padding(10.dp)
-                )
+                IconButton(
+                    onClick = { onEditRequest() }, modifier = Modifier
+                        .border(1.dp, Color.Gray, RoundedCornerShape(20))
+                        .size(35.dp, 35.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = null, tint = Color.Black)
+
+                }
+
             }
             item {
-                Image(
-                    painter = painterResource(id = R.drawable.google_calendar_icon), contentDescription = "alarmClock",
+
+                if (configState.listenOnOwnTimer) DigitalClock(
+                    time = LocalTime.now(),
+                    height = 25,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+                if (configState.listenOnAlarm) Icon(
+                    painter = painterResource(id = R.drawable.alarm), contentDescription = "alarmClock",
                     modifier = Modifier
-                        .size(55.dp, 55.dp)
-                        .padding(10.dp)
+                        .size(30.dp, 30.dp)
+                        .padding(start = 10.dp),
+                    tint = Color.Black
+                )
+                if (configState.listenOnCalendar) Icon(
+                    painter = painterResource(id = R.drawable.calendar), contentDescription = "alarmClock",
+                    modifier = Modifier
+                        .size(30.dp, 30.dp)
+                        .padding(start = 10.dp),
+                    tint = Color.Black
                 )
             }
         }
+    }
+}
 
+@OptIn(DelicateCoroutinesApi::class)
+private fun saveActivation(notificationConfig: NotificationConfig, context: Context) {
+    GlobalScope.launch(Dispatchers.IO) {
+        val repo = NotificationRepository(context = context)
+        repo.add(notificationConfig)
 
     }
 }

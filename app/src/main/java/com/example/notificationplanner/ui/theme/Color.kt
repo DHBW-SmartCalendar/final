@@ -39,7 +39,7 @@ val Violet90 = Color(0xffffccff)
 val Red10 = Color(0xFF410001)
 val Red20 = Color(0xFF680003)
 val Red30 = Color(0xFF930006)
-val Red40 = Color(0xFFBA1B1B)
+val Red40 = Color(0xFFDA4F4F)
 val Red80 = Color(0xFFFFB4A9)
 val Red90 = Color(0xFFFFDAD4)
 

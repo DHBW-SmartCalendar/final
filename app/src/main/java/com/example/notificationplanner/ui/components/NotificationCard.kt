@@ -1,6 +1,11 @@
 package com.example.notificationplanner.ui.components
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -16,14 +21,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.example.notificationplanner.R
 import com.example.notificationplanner.data.NotificationConfig
-import com.example.notificationplanner.data.db.NotificationRepository
+import com.example.notificationplanner.data.db.NotificationConfigRepository
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 
 @Composable
@@ -33,6 +40,24 @@ fun NotificationCard(
     onEditRequest: () -> Unit
 ) {
     val context = LocalContext.current
+
+    var hasNotificationPermission by remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            mutableStateOf(
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            )
+        } else mutableStateOf(true)
+    }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            hasNotificationPermission = isGranted
+        }
+    )
+
 
     ElevatedCard(
         modifier = Modifier
@@ -49,7 +74,7 @@ fun NotificationCard(
     ) {
 
         val configState by remember { mutableStateOf(notificationConfig) }
-        var isChecked  by remember { mutableStateOf(notificationConfig.isActive) }
+        var isChecked by remember { mutableStateOf(notificationConfig.isActive) }
 
 
         Row(
@@ -68,9 +93,14 @@ fun NotificationCard(
             Switch(
                 checked = isChecked,
                 onCheckedChange = {
-                    isChecked = it
-                    configState.isActive = isChecked
-                    saveActivation(configState, context)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                    if (hasNotificationPermission) {
+                        isChecked = it
+                        configState.isActive = isChecked
+                        saveActivation(configState, context)
+                    }
                 },
                 modifier = Modifier
                     .padding(5.dp)
@@ -103,27 +133,26 @@ fun NotificationCard(
                         .border(1.dp, Color.Gray, RoundedCornerShape(20))
                         .size(35.dp, 35.dp)
                 ) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = null, tint = Color.Black)
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = null, tint = Color.Gray)
 
                 }
 
             }
             item {
-
-                if (configState.listenOnOwnTimer) DigitalClock(
-                    time = LocalTime.now(),
+                if (configState.listenOnOwnTimer && configState.timerTime != null) DigitalClock(
+                    time = LocalTime.parse(configState.timerTime, DateTimeFormatter.ofPattern("HH:mm")),
                     height = 25,
                     modifier = Modifier.padding(bottom = 2.dp)
                 )
                 if (configState.listenOnAlarm) Icon(
-                    painter = painterResource(id = R.drawable.alarm), contentDescription = "alarmClock",
+                    painter = painterResource(id = R.drawable.alarm), contentDescription = null,
                     modifier = Modifier
                         .size(30.dp, 30.dp)
                         .padding(start = 10.dp),
                     tint = Color.Black
                 )
                 if (configState.listenOnCalendar) Icon(
-                    painter = painterResource(id = R.drawable.calendar), contentDescription = "alarmClock",
+                    painter = painterResource(id = R.drawable.calendar), contentDescription = null,
                     modifier = Modifier
                         .size(30.dp, 30.dp)
                         .padding(start = 10.dp),
@@ -137,8 +166,8 @@ fun NotificationCard(
 @OptIn(DelicateCoroutinesApi::class)
 private fun saveActivation(notificationConfig: NotificationConfig, context: Context) {
     GlobalScope.launch(Dispatchers.IO) {
-        val repo = NotificationRepository(context = context)
-        repo.add(notificationConfig)
+        val repo = NotificationConfigRepository(context = context)
+        repo.addNotificationConfig(notificationConfig)
 
     }
 }

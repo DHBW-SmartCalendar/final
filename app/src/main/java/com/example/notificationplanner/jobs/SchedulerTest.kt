@@ -25,8 +25,16 @@ class SchedulerTest {
                 Intent(context, BroadcastTest::class.java),
                 PendingIntent.FLAG_IMMUTABLE
             )
+            val pendingIntent2 = PendingIntent.getBroadcast(
+                context,
+                3,
+                Intent(context, BroadcastTest::class.java),
+                PendingIntent.FLAG_IMMUTABLE
+            )
             //alarmManager?.setExact(AlarmManager.RTC_WAKEUP, time.timeInMillis, pendingIntent)
-            alarmManager?.setRepeating(AlarmManager.RTC_WAKEUP, time.timeInMillis, 10000, pendingIntent)
+
+            alarmManager?.cancel(pendingIntent)
+
 
         }
     }

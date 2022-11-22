@@ -5,16 +5,19 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.notificationplanner.data.NotificationConfig
+import com.example.notificationplanner.data.ScheduledNotification
 
 @Database(
     entities = [
-        NotificationConfig::class
+        NotificationConfig::class,
+        ScheduledNotification::class
     ],
-    version = 3,
+    version = 6,
     exportSchema = false
 )
 abstract class NotificationDatabase : RoomDatabase() {
-    abstract fun notificationDao(): NotificationConfigurationDAO
+    abstract fun notificationConfigDao(): NotificationConfigDAO
+    abstract fun scheduledNotificationDao(): ScheduledNotificationDAO
 
     companion object {
         @Volatile

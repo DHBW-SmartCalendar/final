@@ -2,6 +2,8 @@
 
 package com.example.notificationplanner
 
+import android.app.PendingIntent
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,7 +22,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.example.notificationplanner.data.NotificationConfig
-import com.example.notificationplanner.data.db.NotificationRepository
+import com.example.notificationplanner.data.db.NotificationConfigRepository
+import com.example.notificationplanner.jobs.AfterSomethingChangedJob
+import com.example.notificationplanner.jobs.SchedulerTest
 import com.example.notificationplanner.ui.components.NotificationCard
 import com.example.notificationplanner.ui.components.NotificationCreationModal
 import com.example.notificationplanner.ui.theme.NotificationPlannerTheme
@@ -27,32 +32,31 @@ import kotlinx.coroutines.*
 
 class MainActivity : ComponentActivity() {
 
-    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
 
-// TODO after editing ui does not update automatically
+// TODO if list is empty show some text
 
         setContent {
             val context = LocalContext.current
 
             NotificationPlannerTheme {
 
-                var notificationList: List<NotificationConfig> by remember { mutableStateOf(emptyList()) }
+                val notificationList = remember { mutableStateListOf<NotificationConfig>() }
                 var createDialogIsOpen by remember { mutableStateOf(false) }
                 var editing: NotificationConfig? by remember { mutableStateOf(null) }
                 val editDialogIsOpen by remember { derivedStateOf { editing != null } }
+                var isSynced by remember { mutableStateOf(false) }
 
-                var tester by remember { mutableStateOf(1) }
 
-                // TODO busy-indicator
                 LaunchedEffect(key1 = createDialogIsOpen, key2 = editing) {
                     lifecycleScope.launch(Dispatchers.IO) {
-                        val repo = NotificationRepository(context = context)
+                        val repo = NotificationConfigRepository(context = context)
                         val list = repo.readAllData
                         withContext(Dispatchers.Main) {
-                            notificationList = list
+                            notificationList.swapList(list)
+                            isSynced = true
                         }
                     }
                 }
@@ -68,8 +72,6 @@ class MainActivity : ComponentActivity() {
                                 containerColor = MaterialTheme.colorScheme.tertiary,
                                 onClick = {
                                     createDialogIsOpen = true
-
-                                    //startActivity(Intent(this@MainActivity, SecondActivity::class.java))
                                 },
                             ) {
                                 Icon(
@@ -92,40 +94,56 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     ) { paddingValues ->
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(top = 10.dp),
-                            contentPadding = paddingValues,
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        if (isSynced) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(top = 10.dp),
+                                contentPadding = paddingValues,
+                                horizontalAlignment = Alignment.CenterHorizontally
 
-                        ) {
-                            items(notificationList) {
-                                NotificationCard(notificationConfig = it, modifier = Modifier.padding(bottom = 15.dp), onEditRequest = {
-                                    editing = it
-                                })
-                            }
-
-                            item {
-                                Button(onClick = { println("list +++++++++++++++++++++++++ ${notificationList.size}") }) {
-                                    Text(text = tester.toString())
-
+                            ) {
+                                items(notificationList) {
+                                    NotificationCard(notificationConfig = it, modifier = Modifier.padding(bottom = 15.dp), onEditRequest = {
+                                        editing = it
+                                    })
                                 }
                             }
+
+                            if (createDialogIsOpen) NotificationCreationModal(
+                                onClose = {
+                                    createDialogIsOpen = false
+                                    isSynced = false
+                                },
+                                notificationConfig = null
+                            )
+
+                            if (editDialogIsOpen) NotificationCreationModal(
+                                onClose = {
+                                    editing = null
+                                    isSynced = false
+                                },
+                                notificationConfig = editing
+                            )
+                        } else {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(
+                                    color = Color.Black,
+                                    strokeWidth = 4.dp
+                                )
+                            }
                         }
-
-                        if (createDialogIsOpen) NotificationCreationModal(onClose = { createDialogIsOpen = false }, notificationConfig = null)
-                        if (editDialogIsOpen) NotificationCreationModal(onClose = {
-                            editing = null
-                            tester++
-                        }, notificationConfig = editing)
-
-
                     }
                 }
             }
         }
     }
+
+    private fun <T> SnapshotStateList<T>.swapList(newList: List<T>) {
+        clear()
+        addAll(newList)
+    }
+
 
     override fun onStop() {
         super.onStop()

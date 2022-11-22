@@ -5,6 +5,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import com.example.notificationplanner.notifications.NotificationService.Companion.PLANNER_CHANNEL_ID
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 class App : Application() {
 
@@ -22,6 +24,8 @@ class App : Application() {
         )
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         manager.createNotificationChannel(channel)
+
+
     }
 
     override fun onTerminate() {

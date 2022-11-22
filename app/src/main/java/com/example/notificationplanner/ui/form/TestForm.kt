@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.notificationplanner.data.NotificationConfig
 import com.example.notificationplanner.externAPI.APIClient
 import com.example.notificationplanner.data.NotificationType
-import com.example.notificationplanner.data.db.NotificationRepository
+import com.example.notificationplanner.data.db.NotificationConfigRepository
 import kotlinx.coroutines.*
 
 @OptIn(DelicateCoroutinesApi::class)
@@ -41,8 +41,8 @@ fun TestForm() {
     }
     Button(onClick = {
         GlobalScope.launch(Dispatchers.IO) {
-            val repo = NotificationRepository(context)
-            repo.add(testNConfig)
+            val repo = NotificationConfigRepository(context)
+            repo.addNotificationConfig(testNConfig)
             println("added to dp +++++++++++++++++++++++++")
         }
     })
@@ -52,7 +52,7 @@ fun TestForm() {
 
     Button(onClick = {
         GlobalScope.launch(Dispatchers.IO) {
-            val repo = NotificationRepository(context)
+            val repo = NotificationConfigRepository(context)
             val data = repo.readAllData
             println("${data.size} +++++++++++++++++++++++++")
         }

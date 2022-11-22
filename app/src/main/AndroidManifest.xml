@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
 
     <application
@@ -40,6 +41,9 @@
                 android:value="" />
         </activity>
         <receiver android:name=".notifications.BroadcastTest" />
+        <receiver android:name=".jobs.AfterSomethingChangedJob" />
+        <receiver android:name=".notifications.scheduler.OwnTimeScheduler" />
+        <receiver android:name=".notifications.WeatherNotification" />
     </application>
 
 </manifest>

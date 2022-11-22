@@ -2,6 +2,7 @@ package com.example.notificationplanner.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity(tableName = "notification_configuration")
 data class NotificationConfig(
@@ -11,7 +12,8 @@ data class NotificationConfig(
     var listenOnAlarm: Boolean = false,
     var listenOnCalendar: Boolean = false,
     var listenOnOwnTimer: Boolean = false,
-    var type: NotificationType? = null,
+    var timerTime: String? = null,
+    var type: NotificationType = NotificationType.WEATHER,
 
     var weather_cloud_cover: Boolean = false,
     var weather_dew_point: Boolean = false,
@@ -23,6 +25,7 @@ data class NotificationConfig(
     var weather_wind_direction: Boolean = false,
     var weather_wind_speed: Boolean = false,
 
+    // TODO replace strings with enum
     var news_topic: String = "",
     var news_amount: Int = 1,
 
@@ -32,4 +35,4 @@ data class NotificationConfig(
     var calendar_next_events_amount: Int = 1
 
 
-)
+): Serializable

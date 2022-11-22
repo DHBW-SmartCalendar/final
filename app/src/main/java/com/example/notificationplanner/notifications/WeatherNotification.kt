@@ -1,32 +1,37 @@
 package com.example.notificationplanner.notifications
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
+import com.example.notificationplanner.R
 
-class WeatherNotification {
+class WeatherNotification : BroadcastReceiver() {
 
-    /*private fun instance(context : Context){
-        val channel = NotificationChannel("channelId123", "test_channel", NotificationManager.IMPORTANCE_HIGH).apply {
-            description = "notification description text"
-        }
-        val notificationManager: NotificationManager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
 
-        val not = NotificationCompat.Builder(context, "channelId123")
-            //.setSmallIcon()
+    override fun onReceive(p0: Context, p1: Intent?) {
+        val notification = NotificationCompat.Builder(p0, NotificationService.PLANNER_CHANNEL_ID)
+            .setSmallIcon(R.drawable.alarm)
             .setContentTitle("Test Title")
             .setContentText("Test Text")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .build()
 
+        Log.i(this.javaClass.name, "received Notification at scheduler")
+        if (ContextCompat.checkSelfPermission(p0, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            with(NotificationManagerCompat.from(p0)) {
+                notify(123, notification)
+                Log.d(this.javaClass.name, "Send Notification finally")
 
-
-            with(NotificationManagerCompat.from(context)) {
-                notify(123, not.build())
-
+            }
+        }else {
+            Log.d(this.javaClass.name, "Permissions not granted")
         }
-    }*/
-
+    }
 }
+

@@ -6,10 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.example.notificationplanner.data.NotificationConfig
-import com.example.notificationplanner.data.ScheduledNotification
+import com.example.notificationplanner.z_old.ScheduledNotification
 import com.example.notificationplanner.data.db.NotificationConfigRepository
-import com.example.notificationplanner.data.db.ScheduledNotificationRepository
-import com.example.notificationplanner.notifications.scheduler.OwnTimeScheduler
+import com.example.notificationplanner.z_old.ScheduledNotificationRepository
+import com.example.notificationplanner.z_old.OwnTimeScheduler
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

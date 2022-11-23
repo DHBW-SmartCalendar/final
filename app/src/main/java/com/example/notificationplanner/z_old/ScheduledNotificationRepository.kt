@@ -1,7 +1,7 @@
-package com.example.notificationplanner.data.db
+package com.example.notificationplanner.z_old
 
 import android.content.Context
-import com.example.notificationplanner.data.ScheduledNotification
+import com.example.notificationplanner.data.db.NotificationDatabase
 
 class ScheduledNotificationRepository(context: Context) {
     

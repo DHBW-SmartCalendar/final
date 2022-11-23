@@ -1,7 +1,7 @@
-package com.example.notificationplanner.data.db
+package com.example.notificationplanner.z_old
 
 import androidx.room.*
-import com.example.notificationplanner.data.ScheduledNotification
+import com.example.notificationplanner.z_old.ScheduledNotification
 
 @Dao
 interface ScheduledNotificationDAO {

@@ -1,8 +1,8 @@
-package com.example.notificationplanner.data
+package com.example.notificationplanner.z_old
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.notificationplanner.data.db.NotificationTrigger
+import com.example.notificationplanner.data.NotificationType
 import java.io.Serializable
 
 

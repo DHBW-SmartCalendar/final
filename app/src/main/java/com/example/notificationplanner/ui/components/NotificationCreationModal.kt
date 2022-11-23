@@ -139,7 +139,7 @@ fun NotificationCreationModal(
                                     Intent(context, AfterSomethingChangedJob::class.java),
                                     PendingIntent.FLAG_IMMUTABLE
                                 )
-                                pendingIntent.send()
+                                // pendingIntent.send()
                             }
                         }
                     }) {

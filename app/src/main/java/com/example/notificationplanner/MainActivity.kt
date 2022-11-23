@@ -2,7 +2,6 @@
 
 package com.example.notificationplanner
 
-import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -23,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.example.notificationplanner.data.NotificationConfig
 import com.example.notificationplanner.data.db.NotificationConfigRepository
-import com.example.notificationplanner.jobs.AfterSomethingChangedJob
-import com.example.notificationplanner.jobs.SchedulerTest
+import com.example.notificationplanner.notifications.WeatherNotification
+import com.example.notificationplanner.notifications.scheduler.IntentProvider
 import com.example.notificationplanner.ui.components.NotificationCard
 import com.example.notificationplanner.ui.components.NotificationCreationModal
 import com.example.notificationplanner.ui.theme.NotificationPlannerTheme
@@ -108,7 +107,22 @@ class MainActivity : ComponentActivity() {
                                         editing = it
                                     })
                                 }
+
+                                // testing
+                                item {
+                                    Button(onClick = {
+                                        val notificationIntent = Intent(context, WeatherNotification::class.java)
+                                        notificationIntent.putExtra("uid", 1)
+                                        val p = IntentProvider.pendingIntentBroadCast(context, 5, notificationIntent)
+                                        p.send()
+                                    }) {
+                                        Text(text = "test test test")
+                                    }
+                                }
                             }
+
+
+
 
                             if (createDialogIsOpen) NotificationCreationModal(
                                 onClose = {

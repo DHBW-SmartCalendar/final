@@ -1,4 +1,4 @@
-package com.example.notificationplanner.data.db
+package com.example.notificationplanner.z_old
 
 import java.io.Serializable
 

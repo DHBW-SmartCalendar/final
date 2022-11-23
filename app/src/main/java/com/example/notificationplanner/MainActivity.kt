@@ -27,6 +27,7 @@ import com.example.notificationplanner.notifications.scheduler.IntentProvider
 import com.example.notificationplanner.ui.components.NotificationCard
 import com.example.notificationplanner.ui.components.NotificationCreationModal
 import com.example.notificationplanner.ui.theme.NotificationPlannerTheme
+import com.example.notificationplanner.utils.CalendarProvider
 import kotlinx.coroutines.*
 
 class MainActivity : ComponentActivity() {
@@ -148,6 +149,15 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
+                }
+                //Just for Testing Calendar ReadOut, delete this button later
+                Button(onClick = {
+                    val c = CalendarProvider()
+                    c.checkPermissionAndReadCalendar(this)
+                },
+                    modifier = Modifier.padding(top = 130.dp)
+                ){
+                    Text(text="Press to Log Calendar Events")
                 }
             }
         }

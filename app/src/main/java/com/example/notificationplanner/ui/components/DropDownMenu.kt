@@ -12,18 +12,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import com.example.notificationplanner.data.NotificationType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropDownMenu(
-    items: List<NotificationType>,
-    placeholder: String = "",
-    onSelectionChanged: (NotificationType) -> Unit
+fun <T : DropDownCompatible> DropDownMenu(
+    items: List<T>,
+    onSelectionChanged: (T) -> Unit,
+    placeholder: String? = null
 ) {
     val width = LocalConfiguration.current.screenWidthDp - (LocalConfiguration.current.screenWidthDp * 0.1)
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf(placeholder) }
+    var selectedText by remember { mutableStateOf(placeholder ?: items.first().getLabelText()) }
     val icon by remember {
         derivedStateOf {
             if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
@@ -36,7 +35,7 @@ fun DropDownMenu(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
-            label = { Text(selectedText, modifier = Modifier.padding(start = 10.dp)) },
+            label = { Text(text = selectedText, modifier = Modifier.padding(start = 10.dp)) },
             trailingIcon = {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     Icon(icon, "contentDescription", modifier = Modifier.padding(end = 10.dp), tint = Color.Gray)
@@ -54,11 +53,11 @@ fun DropDownMenu(
                 DropdownMenuItem(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
-                        selectedText = type.description
+                        selectedText = type.getLabelText()
                         onSelectionChanged(type)
                         expanded = false
                     },
-                    text = { Text(text = type.description) }
+                    text = { Text(text = type.getLabelText()) }
                 )
             }
         }

@@ -249,7 +249,7 @@ fun NotificationCreationModal(
                     }
                 }
 
-                DropDownMenu(NotificationType.values().asList(), "Choose an option", onSelectionChanged = {
+                DropDownMenu(NotificationType.values().asList(), onSelectionChanged = {
                     currentNotificationType = it
                 })
 

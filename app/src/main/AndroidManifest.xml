@@ -41,8 +41,8 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <receiver android:name=".jobs.AfterSomethingChangedJob" />
-        <receiver android:name=".notifications.WeatherNotification" />
+        <receiver android:name=".notifications.jobs.AfterSomethingChangedJob" />
+        <receiver android:name=".notifications.builder.WeatherNotification" />
 
     </application>
 

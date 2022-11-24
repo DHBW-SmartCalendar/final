@@ -46,7 +46,7 @@ class CalendarProvider {
             val currentStartDate = formatter.format(Date(cursor.getLong(startDateColIdx)))
             val currentEndDate = formatter.format(Date(cursor.getLong(endDateColIdx)))
 
-            Log.d("MY_APP", "$title $currentStartDate $currentEndDate")
+            Log.d(this.javaClass.name, "$title $currentStartDate $currentEndDate")
         }
 
         cursor.close()

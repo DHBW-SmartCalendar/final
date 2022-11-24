@@ -22,8 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.example.notificationplanner.data.NotificationConfig
 import com.example.notificationplanner.data.db.NotificationConfigRepository
-import com.example.notificationplanner.notifications.WeatherNotification
-import com.example.notificationplanner.notifications.scheduler.IntentProvider
+import com.example.notificationplanner.notifications.builder.WeatherNotification
+import com.example.notificationplanner.notifications.jobs.AfterSomethingChangedJob
+import com.example.notificationplanner.utils.IntentProvider
 import com.example.notificationplanner.ui.components.NotificationCard
 import com.example.notificationplanner.ui.components.NotificationCreationModal
 import com.example.notificationplanner.ui.theme.NotificationPlannerTheme
@@ -40,6 +41,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val context = LocalContext.current
+            val activity = this
 
             NotificationPlannerTheme {
 
@@ -112,12 +114,22 @@ class MainActivity : ComponentActivity() {
                                 // testing
                                 item {
                                     Button(onClick = {
-                                        val notificationIntent = Intent(context, WeatherNotification::class.java)
-                                        notificationIntent.putExtra("uid", 1)
-                                        val p = IntentProvider.pendingIntentBroadCast(context, 5, notificationIntent)
+                                        val notificationIntent = Intent(context, AfterSomethingChangedJob::class.java)
+                                        val p = IntentProvider.pendingIntentBroadCast(context, 99, notificationIntent)
                                         p.send()
                                     }) {
                                         Text(text = "test test test")
+                                    }
+                                }
+                                item {
+                                    //Just for Testing Calendar ReadOut, delete this button later
+                                    Button(
+                                        onClick = {
+                                            val c = CalendarProvider()
+                                            c.checkPermissionAndReadCalendar(activity)
+                                        },
+                                    ) {
+                                        Text(text = "Press to Log Calendar Events")
                                     }
                                 }
                             }
@@ -150,15 +162,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
-                //Just for Testing Calendar ReadOut, delete this button later
-                Button(onClick = {
-                    val c = CalendarProvider()
-                    c.checkPermissionAndReadCalendar(this)
-                },
-                    modifier = Modifier.padding(top = 130.dp)
-                ){
-                    Text(text="Press to Log Calendar Events")
-                }
+
             }
         }
     }

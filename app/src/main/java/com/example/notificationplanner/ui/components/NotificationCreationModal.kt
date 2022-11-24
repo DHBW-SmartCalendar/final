@@ -34,7 +34,7 @@ import com.example.notificationplanner.R
 import com.example.notificationplanner.data.NotificationConfig
 import com.example.notificationplanner.data.NotificationType
 import com.example.notificationplanner.data.db.NotificationConfigRepository
-import com.example.notificationplanner.jobs.AfterSomethingChangedJob
+import com.example.notificationplanner.notifications.jobs.AfterSomethingChangedJob
 import com.example.notificationplanner.ui.form.*
 import com.example.notificationplanner.ui.theme.Red40
 import com.vanpra.composematerialdialogs.MaterialDialog

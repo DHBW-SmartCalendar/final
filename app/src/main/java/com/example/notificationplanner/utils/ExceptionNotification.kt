@@ -1,10 +1,11 @@
-package com.example.notificationplanner.notifications
+package com.example.notificationplanner.utils
 
 import android.app.Notification
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.notificationplanner.R
+import com.example.notificationplanner.notifications.NotificationService
 
 class ExceptionNotification {
     companion object {
@@ -30,13 +31,13 @@ class ExceptionNotification {
         }
         fun sendExceptionNotification(context: Context, msg: String? = null ) {
             val notification = if (msg != null) {
-                ExceptionNotification.create(
+                create(
                     "Fail",
                     msg,
                     context
                 )
             } else {
-                ExceptionNotification.default(context)
+                default(context)
             }
             with(NotificationManagerCompat.from(context)) {
                 notify(1, notification)

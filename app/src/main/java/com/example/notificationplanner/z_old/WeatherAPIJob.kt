@@ -9,6 +9,7 @@ import com.example.notificationplanner.data.db.NotificationConfigRepository
 import com.example.notificationplanner.externAPI.APIClient
 import com.example.notificationplanner.externAPI.json.weather.Weather
 import com.example.notificationplanner.externAPI.json.weather.WeatherInformation
+import com.example.notificationplanner.utils.InternetConnection
 import kotlinx.coroutines.*
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter

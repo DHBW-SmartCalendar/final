@@ -8,7 +8,8 @@ import android.util.Log
 import com.example.notificationplanner.data.NotificationConfig
 import com.example.notificationplanner.data.NotificationType
 import com.example.notificationplanner.data.db.NotificationConfigRepository
-import com.example.notificationplanner.notifications.scheduler.IntentProvider
+import com.example.notificationplanner.utils.DateNullException
+import com.example.notificationplanner.utils.IntentProvider
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -87,11 +88,15 @@ class OwnTimeScheduler : BroadcastReceiver() {
         return null
     }
 
-    private fun getUnixMillis(timeStr: String): Long {
-        return LocalDateTime.of(LocalDate.now(), LocalTime.parse(timeStr, DateTimeFormatter.ofPattern("HH:mm")))
-            .atZone(ZoneId.systemDefault())
-            .toInstant()
-            .toEpochMilli()
+    private fun getUnixMillis(timeStr: String?): Long {
+        return if (timeStr != null) {
+            LocalDateTime.of(LocalDate.now(), LocalTime.parse(timeStr, DateTimeFormatter.ofPattern("HH:mm")))
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli()
+        } else {
+            throw DateNullException()
+        }
     }
 
     private fun scheduledLogMessage(scheduledNotification: ScheduledNotification): String {

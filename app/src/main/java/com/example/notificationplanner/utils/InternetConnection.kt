@@ -1,4 +1,4 @@
-package com.example.notificationplanner.z_old
+package com.example.notificationplanner.utils
 
 import android.content.Context
 import android.net.ConnectivityManager

@@ -1,4 +1,4 @@
-package com.example.notificationplanner.notifications
+package com.example.notificationplanner.notifications.builder
 
 import android.Manifest
 import android.app.Notification
@@ -16,8 +16,10 @@ import com.example.notificationplanner.data.db.NotificationConfigRepository
 import com.example.notificationplanner.externAPI.APIClient
 import com.example.notificationplanner.externAPI.json.weather.Weather
 import com.example.notificationplanner.externAPI.json.weather.WeatherInformation
-import com.example.notificationplanner.notifications.ExceptionNotification.Companion.sendExceptionNotification
-import com.example.notificationplanner.z_old.InternetConnection
+import com.example.notificationplanner.notifications.NotificationService
+import com.example.notificationplanner.utils.ExceptionNotification
+import com.example.notificationplanner.utils.ExceptionNotification.Companion.sendExceptionNotification
+import com.example.notificationplanner.utils.InternetConnection
 import kotlinx.coroutines.*
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -28,7 +30,6 @@ class WeatherNotification : BroadcastReceiver() {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent?) {
         val uid = intent?.getIntExtra("uid", -1)
-
         Log.d(this@WeatherNotification.javaClass.name, "Received Intent with : Extra $uid")
 
         var notification: Notification?
@@ -36,7 +37,7 @@ class WeatherNotification : BroadcastReceiver() {
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
                 // DB request & API call
                 if (uid != -1) {
-                    val repoConfig = NotificationConfigRepository(context = context)
+                    val repoConfig = NotificationConfigRepository(context)
                     val config = repoConfig.findById(uid!!)
                     if (config != null) {
                         if (InternetConnection.check(context)) {
@@ -77,11 +78,11 @@ class WeatherNotification : BroadcastReceiver() {
                 } else {
                     Log.e(this@WeatherNotification.javaClass.name, "Intent Extras check failed ::: value -> $uid")
                     sendExceptionNotification(context)
-
                 }
             } else {
                 Log.d(this.javaClass.name, "Permissions not granted")
-                sendExceptionNotification(context, "For receiving notifications from us, please accept the permissions in the settings!")
+                //sendExceptionNotification(context, "For receiving notifications from us, please accept the permissions in the settings!")
+                //TODO show dialog / snackbar
             }
         }
         Log.d(this.javaClass.name, "Send Notification finally")

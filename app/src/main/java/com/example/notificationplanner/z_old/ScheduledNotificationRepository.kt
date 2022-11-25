@@ -5,7 +5,7 @@ import com.example.notificationplanner.data.db.NotificationDatabase
 
 class ScheduledNotificationRepository(context: Context) {
     
-    private val dao = NotificationDatabase.getDatabase(context).scheduledNotificationDao()
+    /*private val dao = NotificationDatabase.getDatabase(context).scheduledNotificationDao()
 
     val readAllData: List<ScheduledNotification> = dao.readAllScheduledNotifications()
 
@@ -19,5 +19,5 @@ class ScheduledNotificationRepository(context: Context) {
 
     suspend fun deleteScheduledNotification(scheduledNotification: ScheduledNotification) {
         dao.deleteScheduledNotification(scheduledNotification)
-    }
+    }*/
 }

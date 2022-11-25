@@ -9,8 +9,6 @@ class NotificationConfigRepository(context: Context) {
 
     val readAllData: List<NotificationConfig> = dao.readAllNotificationConfigurations()
 
-
-    // TODO absturz kp
     suspend fun findById(id: Int): NotificationConfig? {
         return dao.findNotificationConfigById(id)!!
     }

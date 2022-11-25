@@ -2,11 +2,13 @@ package com.example.notificationplanner.ui.components
 
 
 import android.Manifest
+import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -37,6 +39,7 @@ import com.example.notificationplanner.data.db.NotificationConfigRepository
 import com.example.notificationplanner.notifications.jobs.AfterSomethingChangedJob
 import com.example.notificationplanner.ui.form.*
 import com.example.notificationplanner.ui.theme.Red40
+import com.example.notificationplanner.utils.IntentProvider
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
@@ -44,7 +47,7 @@ import kotlinx.coroutines.*
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
 fun NotificationCreationModal(
     onClose: () -> Unit,
@@ -63,6 +66,7 @@ fun NotificationCreationModal(
             var calendarSelected by remember { mutableStateOf(currentNotificationConfig.listenOnCalendar) }
             var ownTimeSelected by remember { mutableStateOf(currentNotificationConfig.listenOnOwnTimer) }
             val timePickerDialogState = rememberMaterialDialogState(false)
+
             var pickedTime by remember {
                 mutableStateOf(
                     if (currentNotificationConfig.timerTime != null) LocalTime.parse(
@@ -95,7 +99,6 @@ fun NotificationCreationModal(
                     hasNotificationPermission = isGranted
                 }
             )
-
 
             Column(
                 modifier = Modifier
@@ -175,8 +178,6 @@ fun NotificationCreationModal(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-
-
                     FilterChip(
                         onClick = {
                             alarmClockSelected = !alarmClockSelected
@@ -212,8 +213,6 @@ fun NotificationCreationModal(
                                 timePickerDialogState.show()
                             }
                             ownTimeSelected = !ownTimeSelected
-
-
                         },
                         modifier = Modifier,
                         label = {
@@ -227,7 +226,6 @@ fun NotificationCreationModal(
                             Icon(painter = painterResource(id = R.drawable.stopwatch), contentDescription = "alarm icon")
                         },
                         selected = ownTimeSelected
-
                     )
                 }
                 Spacer(modifier = Modifier.height(10.dp))
@@ -272,8 +270,9 @@ fun NotificationCreationModal(
                     Button(
                         modifier = Modifier,
                         onClick = {
-                            delete(currentNotificationConfig, context)
-                            onClose()
+
+                              delete(notificationConfig!!, context)
+                                onClose()
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Red40)
                     ) {
@@ -288,7 +287,7 @@ fun NotificationCreationModal(
 @OptIn(DelicateCoroutinesApi::class)
 private fun save(notificationConfig: NotificationConfig, context: Context) {
     GlobalScope.launch(Dispatchers.IO) {
-        val repo = NotificationConfigRepository(context = context)
+        val repo = NotificationConfigRepository(context)
         repo.addNotificationConfig(notificationConfig)
 
     }
@@ -296,10 +295,24 @@ private fun save(notificationConfig: NotificationConfig, context: Context) {
 
 @OptIn(DelicateCoroutinesApi::class)
 private fun delete(notificationConfig: NotificationConfig, context: Context) {
+    val uid = notificationConfig.uid
     GlobalScope.launch(Dispatchers.IO) {
-        val repo = NotificationConfigRepository(context = context)
-        repo.deleteNotificationConfig(notificationConfig)
-
+        val repoConfig = NotificationConfigRepository(context)
+        try {
+            val config = repoConfig.findById(uid)
+            if (config != null) {
+                val notificationIntent = IntentProvider.pendingIntentBroadCast(context, config)
+                val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
+                alarmManager?.cancel(notificationIntent)
+                Log.d("NotificationCreationModal", "Canceled notification intent $uid")
+                repoConfig.deleteNotificationConfig(config)
+                Log.d("NotificationCreationModal", "Deleted NotificationConfig uid:$uid")
+            } else {
+                Log.e("NotificationCreationModal", "DB : data not found :: uid : $uid")
+            }
+        } catch (e: Exception) {
+            Log.e("NotificationCreationModal", "DB Error $uid")
+        }
     }
 }
 

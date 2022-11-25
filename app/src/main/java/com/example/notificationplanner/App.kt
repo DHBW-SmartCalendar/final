@@ -5,18 +5,16 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import com.example.notificationplanner.notifications.NotificationService.Companion.PLANNER_CHANNEL_ID
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        println("Application started +++++++++++++++++++++++++++++++++++++++++++++++++++")
         createNotificationChannel()
 
     }
-    private fun createNotificationChannel(){
+
+    private fun createNotificationChannel() {
         val channel = NotificationChannel(
             PLANNER_CHANNEL_ID,
             "Planner",
@@ -30,7 +28,6 @@ class App : Application() {
 
     override fun onTerminate() {
         super.onTerminate()
-        println("Application terminated +++++++++++++++++++++++++++++++++++++++++++++++++++")
 
     }
 }

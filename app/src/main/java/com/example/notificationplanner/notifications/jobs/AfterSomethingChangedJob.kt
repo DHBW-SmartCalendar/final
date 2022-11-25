@@ -34,12 +34,20 @@ class AfterSomethingChangedJob : BroadcastReceiver() {
             configList.forEach {
                 if (alarmManager != null) {
                     if (it.isActive) {
+
                         if (it.listenOnOwnTimer) {
                             try {
                                 val time = getUnixMillis(it.timerTime)
-                                val notificationIntent = IntentProvider.pendingIntentBroadCast(context, it)
-                                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, time, day, notificationIntent)
-                                Log.d(this@AfterSomethingChangedJob.javaClass.name, "Scheduled successful daily notification for :: ${it.timerTime}")
+                                if (time - System.currentTimeMillis() > 0) {
+                                    val notificationIntent = IntentProvider.pendingIntentBroadCast(context, it)
+                                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, notificationIntent)
+                                    Log.d(
+                                        this@AfterSomethingChangedJob.javaClass.name,
+                                        "Scheduled successful (own time) notification for :: ${it.timerTime} in Millis $time "
+                                    )
+                                } else {
+                                    Log.w(this@AfterSomethingChangedJob.javaClass.name, "config : ${it.uid} is not in today's time range")
+                                }
                             } catch (e: DateNullException) {
                                 Log.e(this@AfterSomethingChangedJob.javaClass.name, "Failed to convert time")
                             }
@@ -51,13 +59,12 @@ class AfterSomethingChangedJob : BroadcastReceiver() {
                             alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, notificationIntent)
                             Log.d(
                                 this@AfterSomethingChangedJob.javaClass.name,
-                                "Scheduled successful notification (listen for alarm clock) for :: ${millisToLocalDateTime(time)}"
+                                "Scheduled successful notification (listen for alarm clock) for :: ${millisToLocalDateTime(time)} in Millis $time"
                             )
                         }
 
                     } else {
-                        val notificationIntent = IntentProvider.pendingIntentBroadCast(context, it)
-                        alarmManager.cancel(notificationIntent)
+                        alarmManager.cancel(IntentProvider.pendingIntentBroadCast(context, it))
                     }
                 } else {
                     Log.e(this@AfterSomethingChangedJob.javaClass.name, "Alarmmanager is not available ")

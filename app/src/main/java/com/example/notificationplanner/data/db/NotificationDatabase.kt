@@ -9,16 +9,12 @@ import com.example.notificationplanner.z_old.ScheduledNotification
 import com.example.notificationplanner.z_old.ScheduledNotificationDAO
 
 @Database(
-    entities = [
-        NotificationConfig::class,
-        ScheduledNotification::class
-    ],
+    entities = [NotificationConfig::class, ],
     version = 7,
     exportSchema = false
 )
 abstract class NotificationDatabase : RoomDatabase() {
     abstract fun notificationConfigDao(): NotificationConfigDAO
-    abstract fun scheduledNotificationDao(): ScheduledNotificationDAO
 
     companion object {
         @Volatile

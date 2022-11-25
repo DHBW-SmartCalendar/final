@@ -1,4 +1,4 @@
-package com.example.notificationplanner.utils
+package com.example.notificationplanner.exception
 
 import android.app.Notification
 import android.content.Context

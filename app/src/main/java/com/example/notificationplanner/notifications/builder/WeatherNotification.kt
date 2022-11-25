@@ -1,91 +1,55 @@
 package com.example.notificationplanner.notifications.builder
 
-import android.Manifest
-import android.app.Notification
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 import com.example.notificationplanner.R
 import com.example.notificationplanner.data.NotificationConfig
-import com.example.notificationplanner.data.db.NotificationConfigRepository
-import com.example.notificationplanner.externAPI.APIClient
+import com.example.notificationplanner.exception.ExceptionNotification
 import com.example.notificationplanner.externAPI.json.weather.Weather
 import com.example.notificationplanner.externAPI.json.weather.WeatherInformation
 import com.example.notificationplanner.notifications.NotificationService
-import com.example.notificationplanner.utils.ExceptionNotification
-import com.example.notificationplanner.utils.ExceptionNotification.Companion.sendExceptionNotification
-import com.example.notificationplanner.utils.InternetConnection
+import com.example.notificationplanner.utils.NotificationsConditions
 import kotlinx.coroutines.*
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 class WeatherNotification : BroadcastReceiver() {
 
-
     @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent?) {
         val uid = intent?.getIntExtra("uid", -1)
         Log.d(this@WeatherNotification.javaClass.name, "Received Intent with : Extra $uid")
 
-        var notification: Notification?
-        GlobalScope.launch(Dispatchers.IO) {
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                // DB request & API call
-                if (uid != -1) {
-                    val repoConfig = NotificationConfigRepository(context)
-                    val config = repoConfig.findById(uid!!)
-                    if (config != null) {
-                        if (InternetConnection.check(context)) {
-                            APIClient.request(config.type) {
+        NotificationsConditions.check(context, uid!!) { api, config ->
+            //TODO Weather with default location
+            GlobalScope.launch(Dispatchers.IO) {
+                val response = api.getWeather()
+                if (response.isSuccessful) {
+                    Log.d(this@WeatherNotification::class.java.name, "Weather Api request was successful")
+                    val weather = getCurrentWeather(response.body()!!)
 
-                                //TODO Weather with default location
-                                GlobalScope.launch(Dispatchers.IO) {
-                                    val response = it.getWeather()
-                                    notification = if (response.isSuccessful) {
-                                        Log.d(this@WeatherNotification::class.java.name, "Weather Api request was successful")
-                                        val weather = getCurrentWeather(response.body()!!)
+                    val notification = NotificationCompat.Builder(context, NotificationService.PLANNER_CHANNEL_ID)
+                        .setSmallIcon(R.drawable.img_da)
+                        //.setLargeIcon(Bitmap.createBitmap())
+                        .setContentTitle("Weather")
+                        .setStyle(NotificationCompat.BigTextStyle().bigText(getWeatherString(config, weather!!)))
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .build()
 
-                                        NotificationCompat.Builder(context, NotificationService.PLANNER_CHANNEL_ID)
-                                            .setSmallIcon(R.drawable.img_da)
-                                            //.setLargeIcon(Bitmap.createBitmap())
-                                            .setContentTitle("Weather")
-                                            .setStyle(NotificationCompat.BigTextStyle().bigText(getWeatherString(config, weather!!)))
-                                            .setPriority(NotificationCompat.PRIORITY_HIGH)
-                                            .build()
-                                    } else {
-                                        Log.e(this@WeatherNotification.javaClass.name, "Api call failure ")
-                                        ExceptionNotification.default(context)
-                                    }
-
-                                    with(NotificationManagerCompat.from(context)) {
-                                        notify(1, notification!!)
-                                    }
-                                }
-                            }
-                        } else {
-                            Log.e(this@WeatherNotification.javaClass.name, "Internet connection not available")
-                            sendExceptionNotification(context, "To receive weather notifications your device needs to be connected to the internet")
-                        }
-                    } else {
-                        Log.e(this@WeatherNotification.javaClass.name, "Config not found in db")
-                        sendExceptionNotification(context)
+                    with(NotificationManagerCompat.from(context)) {
+                        notify(1, notification)
                     }
+                    Log.d(this@WeatherNotification::class.java.name, "Notification sent finally -> config uid : $uid")
                 } else {
-                    Log.e(this@WeatherNotification.javaClass.name, "Intent Extras check failed ::: value -> $uid")
-                    sendExceptionNotification(context)
+                    Log.e(this@WeatherNotification.javaClass.name, "Api call failure ")
+                    ExceptionNotification.default(context)
                 }
-            } else {
-                Log.d(this.javaClass.name, "Permissions not granted")
-                //sendExceptionNotification(context, "For receiving notifications from us, please accept the permissions in the settings!")
-                //TODO show dialog / snackbar
             }
         }
-        Log.d(this.javaClass.name, "Send Notification finally")
     }
 
     private fun getCurrentWeather(weatherInformation: WeatherInformation): Weather? {
@@ -103,7 +67,6 @@ class WeatherNotification : BroadcastReceiver() {
     }
 
     private fun getWeatherString(config: NotificationConfig, weather: Weather): String {
-
         val str = buildString {
             if (config.weather_cloud_cover) {
                 append("Cloud over        : ${weather.cloud_cover} \n")
@@ -133,10 +96,8 @@ class WeatherNotification : BroadcastReceiver() {
                 append("Wind Speed        : ${weather.wind_speed} \n")
             }
         }
-
         return str
     }
-
 
 }
 

@@ -19,16 +19,20 @@ class OnDeleteJob : BroadcastReceiver() {
             val uid = intent?.getIntExtra("uid", -1)
             val repoConfig = NotificationConfigRepository(context)
             if (uid != -1) {
-                val config = repoConfig.findById(uid!!)
-                if (config != null) {
-                    val notificationIntent = IntentProvider.pendingIntentBroadCast(context, config)
-                    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
-                    alarmManager?.cancel(notificationIntent)
-                    Log.d(this@OnDeleteJob.javaClass.name, "Canceled notification intent")
-                    repoConfig.deleteNotificationConfig(config)
-                    Log.d(this@OnDeleteJob.javaClass.name, "Deleted NotificationConfig uid:$uid")
-                } else {
-                    Log.e(this@OnDeleteJob.javaClass.name, "DB : data not found :: uid : $uid")
+                try {
+                    val config = repoConfig.findById(uid!!)
+                    if (config != null) {
+                        val notificationIntent = IntentProvider.pendingIntentBroadCast(context, config)
+                        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
+                        alarmManager?.cancel(notificationIntent)
+                        Log.d(this@OnDeleteJob.javaClass.name, "Canceled notification intent $uid")
+                        repoConfig.deleteNotificationConfig(config)
+                        Log.d(this@OnDeleteJob.javaClass.name, "Deleted NotificationConfig uid:$uid")
+                    } else {
+                        Log.e(this@OnDeleteJob.javaClass.name, "DB : data not found :: uid : $uid")
+                    }
+                } catch (e: Exception) {
+                    Log.e(this@OnDeleteJob.javaClass.name, "DB Error $uid")
                 }
             } else {
                 Log.e(this@OnDeleteJob.javaClass.name, "Intent extra transmission went wrong")

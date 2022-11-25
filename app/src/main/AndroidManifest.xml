@@ -43,6 +43,7 @@
         </activity>
         <receiver android:name=".notifications.jobs.AfterSomethingChangedJob" />
         <receiver android:name=".notifications.builder.WeatherNotification" />
+        <receiver android:name=".notifications.jobs.OnDeleteJob" />
 
     </application>
 

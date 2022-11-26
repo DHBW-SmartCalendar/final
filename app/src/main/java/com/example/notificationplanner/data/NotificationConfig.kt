@@ -25,14 +25,20 @@ data class NotificationConfig(
     var weather_wind_direction: Boolean = false,
     var weather_wind_speed: Boolean = false,
 
-    // TODO replace strings with enum
+    // TODO 1 replace strings with enum like type (look up on api website, which are provided)
     var news_topic: String = "",
     var news_amount: Int = 1,
 
+    // TODO 2 replace strings with enum like type (look up on api website, which are provided)
     var excuses_category: String = "",
     var excuses_amount: Int = 1,
 
+    var meme_amount : Int = 1,
+
     var calendar_next_events_amount: Int = 1
+
+
+// !!! After changing something in this class you need to increase the database version with 1 -> NotificationDatabase
 
 
 ): Serializable

@@ -22,8 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.example.notificationplanner.data.NotificationConfig
 import com.example.notificationplanner.data.db.NotificationConfigRepository
-import com.example.notificationplanner.notifications.builder.WeatherNotification
-import com.example.notificationplanner.notifications.jobs.AfterSomethingChangedJob
+import com.example.notificationplanner.jobs.SyncScheduledNotificationsJob
 import com.example.notificationplanner.utils.IntentProvider
 import com.example.notificationplanner.ui.components.NotificationCard
 import com.example.notificationplanner.ui.components.NotificationCreationModal
@@ -114,9 +113,8 @@ class MainActivity : ComponentActivity() {
                                 // testing
                                 item {
                                     Button(onClick = {
-                                        val notificationIntent = Intent(context, AfterSomethingChangedJob::class.java)
-                                        val p = IntentProvider.pendingIntentBroadCast(context, 99, notificationIntent)
-                                        p.send()
+                                        val notificationIntent = Intent(context, SyncScheduledNotificationsJob::class.java)
+                                       IntentProvider.pendingIntentBroadCast(context, 99, notificationIntent).send()
                                     }) {
                                         Text(text = "test test test")
                                     }
@@ -162,7 +160,6 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
-
             }
         }
     }

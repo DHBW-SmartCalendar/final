@@ -1,16 +1,17 @@
-package com.example.notificationplanner.notifications.jobs
+package com.example.notificationplanner.jobs
 
 import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.example.notificationplanner.data.NotificationConfig
 import com.example.notificationplanner.data.db.NotificationConfigRepository
+import com.example.notificationplanner.exception.ExceptionNotification
 import com.example.notificationplanner.utils.DateNullException
 import com.example.notificationplanner.utils.IntentProvider
-import com.example.notificationplanner.z_old.OwnTimeScheduler
 import com.example.notificationplanner.z_old.ScheduledNotification
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -19,8 +20,9 @@ import kotlinx.coroutines.launch
 import java.time.*
 import java.time.format.DateTimeFormatter
 
-class AfterSomethingChangedJob : BroadcastReceiver() {
+class SyncScheduledNotificationsJob : BroadcastReceiver() {
 
+    @RequiresApi(Build.VERSION_CODES.S)
     @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent?) {
 
@@ -30,44 +32,50 @@ class AfterSomethingChangedJob : BroadcastReceiver() {
             val configList = repoConfig.readAllData
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
 
-            Log.d(this@AfterSomethingChangedJob.javaClass.name, " DB : ${configList.size} Elements in configList ")
-            configList.forEach {
-                if (alarmManager != null) {
-                    if (it.isActive) {
+            Log.d(this@SyncScheduledNotificationsJob.javaClass.name, " DB : ${configList.size} Elements in configList ")
+            configList.forEach { config ->
+                if (alarmManager != null && alarmManager.canScheduleExactAlarms()) {
+                    if (config.isActive) {
 
-                        if (it.listenOnOwnTimer) {
+                        if (config.listenOnOwnTimer) {
                             try {
-                                val time = getUnixMillis(it.timerTime)
+                                val time = getUnixMillis(config.timerTime)
                                 if (time - System.currentTimeMillis() > 0) {
-                                    val notificationIntent = IntentProvider.pendingIntentBroadCast(context, it)
+                                    val notificationIntent = IntentProvider.pendingIntentBroadCast(context, config)
                                     alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, notificationIntent)
                                     Log.d(
-                                        this@AfterSomethingChangedJob.javaClass.name,
-                                        "Scheduled successful (own time) notification for :: ${it.timerTime} in Millis $time "
+                                        this@SyncScheduledNotificationsJob.javaClass.name,
+                                        "Scheduled successful (own time) notification for :: ${config.timerTime} in Millis $time "
                                     )
                                 } else {
-                                    Log.w(this@AfterSomethingChangedJob.javaClass.name, "config : ${it.uid} is not in today's time range")
+                                    Log.w(this@SyncScheduledNotificationsJob.javaClass.name, "config : ${config.uid} is not in today's time range")
                                 }
                             } catch (e: DateNullException) {
-                                Log.e(this@AfterSomethingChangedJob.javaClass.name, "Failed to convert time")
+                                Log.e(this@SyncScheduledNotificationsJob.javaClass.name, "Failed to convert time")
                             }
                         }
+                        if (config.listenOnAlarm) {
+                            val notificationIntent = IntentProvider.pendingIntentBroadCast(context, config)
+                            alarmManager.nextAlarmClock?.let {
+                                alarmManager.setExact(AlarmManager.RTC_WAKEUP, it.triggerTime, notificationIntent)
+                                Log.d(
+                                    this@SyncScheduledNotificationsJob.javaClass.name,
+                                    "Scheduled successful notification (listen for alarm clock) for :: ${millisToLocalDateTime(it.triggerTime)} in Millis ${it.triggerTime}"
+                                )
+                            } ?: run {
+                                alarmManager.cancel(notificationIntent)
+                                Log.d(this@SyncScheduledNotificationsJob.javaClass.name, "Canceled :: ${config.uid} , because alarm was turned off")
 
-                        if (it.listenOnAlarm) {
-                            val time = alarmManager.nextAlarmClock.triggerTime
-                            val notificationIntent = IntentProvider.pendingIntentBroadCast(context, it)
-                            alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, notificationIntent)
-                            Log.d(
-                                this@AfterSomethingChangedJob.javaClass.name,
-                                "Scheduled successful notification (listen for alarm clock) for :: ${millisToLocalDateTime(time)} in Millis $time"
-                            )
+                            }
                         }
-
                     } else {
-                        alarmManager.cancel(IntentProvider.pendingIntentBroadCast(context, it))
+                        alarmManager.cancel(IntentProvider.pendingIntentBroadCast(context, config))
+                        Log.d(this@SyncScheduledNotificationsJob.javaClass.name, "Canceled :: ${config.uid} ")
                     }
                 } else {
-                    Log.e(this@AfterSomethingChangedJob.javaClass.name, "Alarmmanager is not available ")
+                    Log.e(this@SyncScheduledNotificationsJob.javaClass.name, "Alarmmanager is not available ")
+                    // TODO should be a pop up / snackbar when user opens the app next time
+                    ExceptionNotification.sendExceptionNotification(context, "You need to turn on \"Can schedule exact alarms Permissions! \"")
                 }
             }
         }

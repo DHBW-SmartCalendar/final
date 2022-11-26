@@ -25,6 +25,8 @@ import androidx.core.content.ContextCompat
 import com.example.notificationplanner.R
 import com.example.notificationplanner.data.NotificationConfig
 import com.example.notificationplanner.data.db.NotificationConfigRepository
+import com.example.notificationplanner.jobs.SyncScheduledNotificationsJob
+import com.example.notificationplanner.utils.IntentProvider
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -100,6 +102,7 @@ fun NotificationCard(
                         isChecked = it
                         configState.isActive = isChecked
                         saveActivation(configState, context)
+                        IntentProvider.pendingIntentBroadCast(context, 999999, SyncScheduledNotificationsJob::class.java).send()
                     }
                 },
                 modifier = Modifier
@@ -140,7 +143,7 @@ fun NotificationCard(
             }
             item {
                 if (configState.listenOnOwnTimer && configState.timerTime != null) DigitalClock(
-                    time = LocalTime.parse(configState.timerTime, DateTimeFormatter.ofPattern("HH:mm")),
+                    time = configState.timerTime!!,
                     height = 25,
                     modifier = Modifier.padding(bottom = 2.dp)
                 )

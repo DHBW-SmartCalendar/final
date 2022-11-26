@@ -41,9 +41,17 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <receiver android:name=".notifications.jobs.AfterSomethingChangedJob" />
+        <receiver android:name=".jobs.SyncScheduledNotificationsJob" />
         <receiver android:name=".notifications.builder.WeatherNotification" />
-        <receiver android:name=".notifications.jobs.OnDeleteJob" />
+        <receiver
+            android:name=".jobs.OnNextAlarmClockChangedReveiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.app.action.ACTION_NEXT_ALARM_CLOCK_CHANGED" />
+            </intent-filter>
+        </receiver>
+        <service android:enabled="true" android:name=".jobs.OnNextAlarmClockChangedService" />
 
     </application>
 

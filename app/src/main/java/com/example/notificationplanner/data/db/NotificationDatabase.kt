@@ -10,7 +10,7 @@ import com.example.notificationplanner.z_old.ScheduledNotificationDAO
 
 @Database(
     entities = [NotificationConfig::class, ],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 abstract class NotificationDatabase : RoomDatabase() {

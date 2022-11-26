@@ -3,9 +3,7 @@ package com.example.notificationplanner.ui.components
 
 import android.Manifest
 import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
@@ -36,7 +34,7 @@ import com.example.notificationplanner.R
 import com.example.notificationplanner.data.NotificationConfig
 import com.example.notificationplanner.data.NotificationType
 import com.example.notificationplanner.data.db.NotificationConfigRepository
-import com.example.notificationplanner.notifications.jobs.AfterSomethingChangedJob
+import com.example.notificationplanner.jobs.SyncScheduledNotificationsJob
 import com.example.notificationplanner.ui.form.*
 import com.example.notificationplanner.ui.theme.Red40
 import com.example.notificationplanner.utils.IntentProvider
@@ -47,7 +45,7 @@ import kotlinx.coroutines.*
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class,)
 @Composable
 fun NotificationCreationModal(
     onClose: () -> Unit,
@@ -61,7 +59,7 @@ fun NotificationCreationModal(
             val context = LocalContext.current
 
             val currentNotificationConfig by remember { mutableStateOf(notificationConfig ?: NotificationConfig()) }
-            var currentNotificationType by remember { mutableStateOf(currentNotificationConfig.type ?: NotificationType.WEATHER) }
+            var currentNotificationType by remember { mutableStateOf(currentNotificationConfig.type) }
             var alarmClockSelected by remember { mutableStateOf(currentNotificationConfig.listenOnAlarm) }
             var calendarSelected by remember { mutableStateOf(currentNotificationConfig.listenOnCalendar) }
             var ownTimeSelected by remember { mutableStateOf(currentNotificationConfig.listenOnOwnTimer) }
@@ -124,26 +122,17 @@ fun NotificationCreationModal(
                         currentNotificationConfig.listenOnOwnTimer = ownTimeSelected
                         currentNotificationConfig.type = currentNotificationType
                         if (isValidated(currentNotificationConfig)) {
-                            // TODO temp
-                            if (currentNotificationConfig.listenOnOwnTimer && !currentNotificationConfig.listenOnAlarm && !currentNotificationConfig.listenOnCalendar) {
 
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                                }
-                                if (hasNotificationPermission) {
-                                    currentNotificationConfig.isActive = true
-                                }
-                                save(currentNotificationConfig, context)
-                                onClose()
-
-                                val pendingIntent = PendingIntent.getBroadcast(
-                                    context,
-                                    1,
-                                    Intent(context, AfterSomethingChangedJob::class.java),
-                                    PendingIntent.FLAG_IMMUTABLE
-                                )
-                                // pendingIntent.send()
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
                             }
+                            if (hasNotificationPermission) {
+                                currentNotificationConfig.isActive = true
+                            }
+                            save(currentNotificationConfig, context)
+                            IntentProvider.pendingIntentBroadCast(context, 999999, SyncScheduledNotificationsJob::class.java).send()
+                            onClose()
+
                         }
                     }) {
                         Icon(
@@ -190,21 +179,6 @@ fun NotificationCreationModal(
                             Icon(painter = painterResource(id = R.drawable.alarm), contentDescription = "alarm icon")
                         },
                         selected = alarmClockSelected
-
-                    )
-                    FilterChip(
-                        onClick = {
-                            calendarSelected = !calendarSelected
-
-                        },
-                        modifier = Modifier,
-                        label = {
-                            Text(text = "Calendar")
-                        },
-                        leadingIcon = {
-                            Icon(painter = painterResource(id = R.drawable.calendar), contentDescription = "alarm icon")
-                        },
-                        selected = calendarSelected
 
                     )
                     FilterChip(
@@ -270,9 +244,8 @@ fun NotificationCreationModal(
                     Button(
                         modifier = Modifier,
                         onClick = {
-
-                              delete(notificationConfig!!, context)
-                                onClose()
+                            delete(notificationConfig!!, context)
+                            onClose()
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Red40)
                     ) {
@@ -321,8 +294,4 @@ private fun isValidated(config: NotificationConfig): Boolean {
         return !(config.listenOnOwnTimer && config.timerTime == null)
     }
     return false
-}
-
-fun onSaveResetAllOtherValues() {
-    //TODO if object is going to be saved, all attributes from other Notification types must be false
 }

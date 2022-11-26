@@ -6,6 +6,8 @@ import android.content.Intent
 
 class NewsNotification : BroadcastReceiver() {
     override fun onReceive(p0: Context?, p1: Intent?) {
-        TODO("Not yet implemented")
+        // TODO implement api function to get news -> ApiCollection
+        // use WeatherNotification as reference for implementing this notification
+
     }
 }

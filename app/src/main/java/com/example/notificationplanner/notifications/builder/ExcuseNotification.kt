@@ -6,6 +6,7 @@ import android.content.Intent
 
 class ExcuseNotification : BroadcastReceiver() {
     override fun onReceive(p0: Context?, p1: Intent?) {
-        TODO("Not yet implemented")
+        // TODO implement api function to get excuses -> ApiCollection
+        // use WeatherNotification as reference for implementing this notification
     }
 }

@@ -6,6 +6,7 @@ import android.content.Intent
 
 class MemeNotification : BroadcastReceiver() {
     override fun onReceive(p0: Context?, p1: Intent?) {
-        TODO("Not yet implemented")
+        // TODO implement api function to get memes -> ApiCollection
+        // use WeatherNotification as reference for implementing this notification (use .setStyle(BigPictureStyle))
     }
 }

@@ -25,7 +25,7 @@ class WeatherNotification : BroadcastReceiver() {
         Log.d(this@WeatherNotification.javaClass.name, "Received Intent with : Extra $uid")
 
         NotificationsConditions.check(context, uid!!) { api, config ->
-            //TODO Weather with default location
+            //TODO Weather depending on users location
             GlobalScope.launch(Dispatchers.IO) {
                 val response = api.getWeather()
                 if (response.isSuccessful) {

@@ -19,7 +19,7 @@ import java.util.Formatter
 
 @Composable
 fun DigitalClock(
-    time: LocalTime,
+    time: String,
     height: Int,
     modifier: Modifier = Modifier
 
@@ -27,13 +27,12 @@ fun DigitalClock(
     Box(
         modifier = Modifier
             .size(height = height.dp, width = (2 * height).dp)
-            .border(1.dp, Color.Black, RoundedCornerShape(25)).then(modifier),
+            .border(1.dp, Color.Black, RoundedCornerShape(25))
+            .then(modifier),
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = DateTimeFormatter
-                .ofPattern("HH:mm")
-                .format(time),
+            text = time,
             fontFamily = FontFamily.Monospace,
             fontSize = 14.sp,
             color = Color.Black

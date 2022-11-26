@@ -1,6 +1,4 @@
-package com.example.notificationplanner.data.weather
-
-import com.example.notificationplanner.data.ResponseContent
+package com.example.notificationplanner.externAPI.json.weather
 
 data class Weather(
     val cloud_cover: Int,
@@ -19,4 +17,4 @@ data class Weather(
     val wind_gust_direction: Any,
     val wind_gust_speed: Double,
     val wind_speed: Double
-): ResponseContent()
+)

@@ -6,8 +6,10 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import com.example.notificationplanner.notifications.NotificationService.Companion.PLANNER_CHANNEL_ID
-import com.example.notificationplanner.jobs.OnNextAlarmClockChangedService
+import com.example.notificationplanner.jobs.ClosedAppService
+import com.example.notificationplanner.jobs.OnBootCompletedReceiver
 import com.example.notificationplanner.jobs.SyncScheduledNotificationsJob
 import com.example.notificationplanner.utils.IntentProvider
 import java.time.LocalDate
@@ -21,8 +23,9 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        applicationContext.startForegroundService(Intent(applicationContext, OnNextAlarmClockChangedService::class.java))
+        applicationContext.startForegroundService(Intent(applicationContext, ClosedAppService::class.java))
         registerDailySync()
+        registerReceiver(OnBootCompletedReceiver(), IntentFilter(Intent.ACTION_BOOT_COMPLETED))
     }
 
     private fun createNotificationChannel() {

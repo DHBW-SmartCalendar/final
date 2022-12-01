@@ -1,16 +1,17 @@
 package com.example.notificationplanner.jobs
 
-import android.app.AlarmManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.example.notificationplanner.utils.IntentProvider
 
-class OnNextAlarmClockChangedReveiver : BroadcastReceiver() {
+class OnBootCompletedReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
-        if (intent?.action.equals(AlarmManager.ACTION_NEXT_ALARM_CLOCK_CHANGED)) {
+        if (intent?.action.equals(Intent.ACTION_BOOT_COMPLETED)){
             // TODO not optimal way -> request code
             IntentProvider.pendingIntentBroadCast(context, 999999, SyncScheduledNotificationsJob::class.java).send()
+            Log.i(this.javaClass.name, "System booted -> synced scheduled notifications")
         }
     }
 }

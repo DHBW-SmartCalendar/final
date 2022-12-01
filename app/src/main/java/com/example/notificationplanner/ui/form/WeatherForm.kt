@@ -151,9 +151,6 @@ fun WeatherForm(
                 selected = windSpeed,
                 colors = filterChipColorScheme
             )
-
         }
     }
-
-
 }

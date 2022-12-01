@@ -42,7 +42,7 @@ class SyncScheduledNotificationsJob : BroadcastReceiver() {
                                 val time = getUnixMillis(config.timerTime)
                                 if (time - System.currentTimeMillis() > 0) {
                                     val notificationIntent = IntentProvider.pendingIntentBroadCast(context, config)
-                                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, notificationIntent)
+                                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, notificationIntent)
                                     Log.d(
                                         this@SyncScheduledNotificationsJob.javaClass.name,
                                         "Scheduled successful (own time) notification for :: ${config.timerTime} in Millis $time "
@@ -57,7 +57,7 @@ class SyncScheduledNotificationsJob : BroadcastReceiver() {
                         if (config.listenOnAlarm) {
                             val notificationIntent = IntentProvider.pendingIntentBroadCast(context, config)
                             alarmManager.nextAlarmClock?.let {
-                                alarmManager.setExact(AlarmManager.RTC_WAKEUP, it.triggerTime, notificationIntent)
+                                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, it.triggerTime, notificationIntent)
                                 Log.d(
                                     this@SyncScheduledNotificationsJob.javaClass.name,
                                     "Scheduled successful notification (listen for alarm clock) for :: ${millisToLocalDateTime(it.triggerTime)} in Millis ${it.triggerTime}"

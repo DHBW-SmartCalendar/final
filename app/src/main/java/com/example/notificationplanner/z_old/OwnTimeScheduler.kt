@@ -54,7 +54,7 @@ class OwnTimeScheduler : BroadcastReceiver() {
                         val weatherApiIntent = Intent(p0, WeatherAPIJob::class.java)
                         weatherApiIntent.putExtra("uid", config.uid)
                         weatherApiIntent.putExtra("time", getUnixMillis(scheduledNotification.time!!))
-                        val pendingIntent = IntentProvider.pendingIntentBroadCast(p0, 3, weatherApiIntent)
+                        val pendingIntent = IntentProvider.pendingIntentBroadcast(p0, 3, weatherApiIntent)
                         val alarmManager = p0.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
 
 

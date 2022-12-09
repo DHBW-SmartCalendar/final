@@ -110,7 +110,7 @@ class MainActivity : ComponentActivity() {
                                     })
                                 }
 
-                                // testing
+                              /*  // testing
                                 item {
                                     Button(onClick = {
                                         val notificationIntent = Intent(context, SyncScheduledNotificationsJob::class.java)
@@ -129,7 +129,7 @@ class MainActivity : ComponentActivity() {
                                     ) {
                                         Text(text = "Press to Log Calendar Events")
                                     }
-                                }
+                                }*/
                             }
 
 
@@ -172,7 +172,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        println("destroy ++++++++++++++++++++++++++++++++")
+        println("destroyed ++++++++++++++++++++++++++++++++")
     }
 
 }

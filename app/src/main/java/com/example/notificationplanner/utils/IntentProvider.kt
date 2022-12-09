@@ -10,21 +10,21 @@ import com.example.notificationplanner.notifications.builder.*
 class IntentProvider {
     companion object {
 
-        fun <T> pendingIntentBroadCast(context: Context, requestCode: Int, destination: Class<T>): PendingIntent {
+        fun <T> pendingIntentBroadcast(context: Context, requestCode: Int, destination: Class<T>): PendingIntent {
             return PendingIntent.getBroadcast(context, requestCode, Intent(context, destination), PendingIntent.FLAG_IMMUTABLE)
         }
 
-        fun <T> pendingIntentBroadCast(context: Context, notificationConfig: NotificationConfig, destination: Class<T>): PendingIntent {
+        fun <T> pendingIntentBroadcast(context: Context, notificationConfig: NotificationConfig, destination: Class<T>): PendingIntent {
             val i = Intent(context, destination)
             i.putExtra("uid", notificationConfig.uid)
             return PendingIntent.getBroadcast(context, notificationConfig.uid, i, PendingIntent.FLAG_IMMUTABLE)
         }
 
-        fun pendingIntentBroadCast(context: Context, notificationConfig: NotificationConfig): PendingIntent {
+        fun pendingIntentBroadcast(context: Context, notificationConfig: NotificationConfig): PendingIntent {
             return PendingIntent.getBroadcast(context, notificationConfig.uid, getIntent(context, notificationConfig), PendingIntent.FLAG_IMMUTABLE)
         }
 
-        fun pendingIntentBroadCast(context: Context, requestCode: Int, intent: Intent): PendingIntent {
+        fun pendingIntentBroadcast(context: Context, requestCode: Int, intent: Intent): PendingIntent {
             return PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_IMMUTABLE)
         }
 

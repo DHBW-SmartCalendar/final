@@ -13,13 +13,14 @@
         android:name=".App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher_da"
         android:label="NPlanner"
         android:roundIcon="@mipmap/ic_launcher_da_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NotificationPlanner"
-        tools:targetApi="33">
+        tools:targetApi="tiramisu">
         <activity
             android:name=".SecondActivity"
             android:exported="false"
@@ -43,6 +44,7 @@
                 android:value="" />
         </activity>
 
+
         <receiver android:name=".jobs.SyncScheduledNotificationsJob" />
         <receiver android:name=".notifications.builder.WeatherNotification" />
 
@@ -51,7 +53,7 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.app.action.ACTION_NEXT_ALARM_CLOCK_CHANGED" />
+                <action android:name="android.app.action.NEXT_ALARM_CLOCK_CHANGED" />
             </intent-filter>
         </receiver>
 
@@ -60,12 +62,9 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.app.action.ACTION_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
-        <service
-            android:name=".jobs.ClosedAppService"
-            android:enabled="true" />
     </application>
 </manifest>

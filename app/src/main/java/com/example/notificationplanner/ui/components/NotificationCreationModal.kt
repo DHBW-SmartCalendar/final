@@ -130,7 +130,7 @@ fun NotificationCreationModal(
                                 currentNotificationConfig.isActive = true
                             }
                             save(currentNotificationConfig, context)
-                            IntentProvider.pendingIntentBroadCast(context, 999999, SyncScheduledNotificationsJob::class.java).send()
+                            IntentProvider.pendingIntentBroadcast(context, 999999, SyncScheduledNotificationsJob::class.java).send()
                             onClose()
 
                         }
@@ -274,7 +274,7 @@ private fun delete(notificationConfig: NotificationConfig, context: Context) {
         try {
             val config = repoConfig.findById(uid)
             if (config != null) {
-                val notificationIntent = IntentProvider.pendingIntentBroadCast(context, config)
+                val notificationIntent = IntentProvider.pendingIntentBroadcast(context, config)
                 val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
                 alarmManager?.cancel(notificationIntent)
                 Log.d("NotificationCreationModal", "Canceled notification intent $uid")
@@ -292,6 +292,8 @@ private fun delete(notificationConfig: NotificationConfig, context: Context) {
 private fun isValidated(config: NotificationConfig): Boolean {
     if (config.listenOnOwnTimer || config.listenOnCalendar || config.listenOnAlarm) {
         return !(config.listenOnOwnTimer && config.timerTime == null)
+    }else{
+        Log.w("Modal", "nothing chosen")
     }
     return false
 }

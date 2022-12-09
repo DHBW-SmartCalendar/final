@@ -31,8 +31,6 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 
 @Composable
@@ -102,7 +100,7 @@ fun NotificationCard(
                         isChecked = it
                         configState.isActive = isChecked
                         saveActivation(configState, context)
-                        IntentProvider.pendingIntentBroadCast(context, 999999, SyncScheduledNotificationsJob::class.java).send()
+                        IntentProvider.pendingIntentBroadcast(context, 999999, SyncScheduledNotificationsJob::class.java).send()
                     }
                 },
                 modifier = Modifier

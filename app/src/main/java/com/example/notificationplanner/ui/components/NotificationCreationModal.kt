@@ -45,11 +45,12 @@ import kotlinx.coroutines.*
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class,)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationCreationModal(
     onClose: () -> Unit,
-    notificationConfig: NotificationConfig?
+    notificationConfig: NotificationConfig?,
+    isEditing: Boolean
 ) {
 
     Dialog(
@@ -241,7 +242,7 @@ fun NotificationCreationModal(
                     verticalArrangement = Arrangement.Bottom
                 )
                 {
-                    Button(
+                    if (isEditing) Button(
                         modifier = Modifier,
                         onClick = {
                             delete(notificationConfig!!, context)
@@ -292,7 +293,7 @@ private fun delete(notificationConfig: NotificationConfig, context: Context) {
 private fun isValidated(config: NotificationConfig): Boolean {
     if (config.listenOnOwnTimer || config.listenOnCalendar || config.listenOnAlarm) {
         return !(config.listenOnOwnTimer && config.timerTime == null)
-    }else{
+    } else {
         Log.w("Modal", "nothing chosen")
     }
     return false

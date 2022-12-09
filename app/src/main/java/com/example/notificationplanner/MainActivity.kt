@@ -140,7 +140,8 @@ class MainActivity : ComponentActivity() {
                                     createDialogIsOpen = false
                                     isSynced = false
                                 },
-                                notificationConfig = null
+                                notificationConfig = null,
+                                isEditing = false
                             )
 
                             if (editDialogIsOpen) NotificationCreationModal(
@@ -148,7 +149,8 @@ class MainActivity : ComponentActivity() {
                                     editing = null
                                     isSynced = false
                                 },
-                                notificationConfig = editing
+                                notificationConfig = editing,
+                                isEditing = true
                             )
                         } else {
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

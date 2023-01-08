@@ -15,9 +15,9 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher_da"
+        android:icon="@mipmap/keiho_icon_1"
         android:label="NPlanner"
-        android:roundIcon="@mipmap/ic_launcher_da_round"
+        android:roundIcon="@mipmap/keiho_icon_1_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NotificationPlanner"
         tools:targetApi="tiramisu">

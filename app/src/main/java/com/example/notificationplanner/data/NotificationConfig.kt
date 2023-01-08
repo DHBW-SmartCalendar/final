@@ -2,6 +2,7 @@ package com.example.notificationplanner.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.notificationplanner.externAPI.json.excuses.Excuse_Category
 import java.io.Serializable
 
 @Entity(tableName = "notification_configuration")
@@ -30,7 +31,7 @@ data class NotificationConfig(
     var news_amount: Int = 1,
 
     // TODO 2 replace strings with enum like type (look up on api website, which are provided)
-    var excuses_category: String = "",
+    var excuses_category: Excuse_Category = Excuse_Category.FAMILY,
     var excuses_amount: Int = 1,
 
     var meme_amount : Int = 1,

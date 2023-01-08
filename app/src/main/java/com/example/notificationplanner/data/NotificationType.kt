@@ -19,7 +19,7 @@ enum class NotificationType( val description: String, val url: String? = null) :
            return description
         }
     },
-    EXCUSE("Random Excuse", "https://excuser.herokuapp.com/v1/") { //excuse
+    EXCUSE("Random Excuse", "https://excuser-three.vercel.app/v1/") { //excuse
         override fun getLabelText(): String {
            return description
         }

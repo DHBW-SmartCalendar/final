@@ -131,6 +131,7 @@ fun NotificationCreationModal(
                                 currentNotificationConfig.isActive = true
                             }
                             save(currentNotificationConfig, context)
+                            println("YOUR NOTIFICATION:  $currentNotificationConfig")
                             IntentProvider.pendingIntentBroadcast(context, 999999, SyncScheduledNotificationsJob::class.java).send()
                             onClose()
 
@@ -231,7 +232,7 @@ fun NotificationCreationModal(
                     NotificationType.NEWS -> NewsForm()
                     NotificationType.CALENDAR -> CalendarForm()
                     NotificationType.MEME -> MemeForm()
-                    NotificationType.EXCUSE -> ExcusesForm()
+                    NotificationType.EXCUSE -> ExcusesForm(currentNotificationConfig)
                 }
 
                 Column(

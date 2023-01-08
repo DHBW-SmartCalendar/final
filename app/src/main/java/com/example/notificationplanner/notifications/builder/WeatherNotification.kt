@@ -21,6 +21,7 @@ class WeatherNotification : BroadcastReceiver() {
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent?) {
+        println("Starts WheatherNotifcation")
          val uid = intent?.getIntExtra("uid", -1)
         Log.d(this@WeatherNotification.javaClass.name, "Received Intent with : Extra $uid")
 

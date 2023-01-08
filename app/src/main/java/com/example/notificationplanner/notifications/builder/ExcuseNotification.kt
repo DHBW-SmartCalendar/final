@@ -24,6 +24,7 @@ class ExcuseNotification : BroadcastReceiver() {
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent?) {
+        println("WORKS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         // TODO implement api function to get excuses -> ApiCollection
         // use WeatherNotification as reference for implementing this notification
 
@@ -32,7 +33,7 @@ class ExcuseNotification : BroadcastReceiver() {
 
         NotificationsConditions.check(context, uid!!) { api, config ->
             GlobalScope.launch(Dispatchers.IO) {
-                val response = api.getExcuse()
+                val response = api.getExcuse(config.excuses_category.toString().toLowerCase(), config.excuses_amount)
                 println("RESPONSE: " + response)
                 Log.d(this@ExcuseNotification::class.java.name,"HERE RESPONSE !!!!!!!!!!!!!!: $response")
                 if (response.isSuccessful) {

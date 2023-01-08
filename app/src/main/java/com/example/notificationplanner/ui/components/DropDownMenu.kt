@@ -16,11 +16,13 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T : DropDownCompatible> DropDownMenu(
+    modifier: Modifier = Modifier,
     items: List<T>,
     onSelectionChanged: (T) -> Unit,
-    placeholder: String? = null
+    placeholder: String? = null,
+
 ) {
-    val width = LocalConfiguration.current.screenWidthDp - (LocalConfiguration.current.screenWidthDp * 0.1)
+    val width = LocalConfiguration.current.screenWidthDp - (LocalConfiguration.current.screenWidthDp * 0.2)
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember { mutableStateOf(placeholder ?: items.first().getLabelText()) }
     val icon by remember {
@@ -28,19 +30,23 @@ fun <T : DropDownCompatible> DropDownMenu(
             if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
         }
     }
-    Column(Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         AssistChip(
             onClick = { expanded = !expanded },
             shape = RoundedCornerShape(50),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
-            label = { Text(text = selectedText, modifier = Modifier.padding(start = 10.dp)) },
+                .height(40.dp),
+            label = { Text(text = selectedText, modifier = Modifier.padding(start = 5.dp)) },
             trailingIcon = {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     Icon(icon, "contentDescription", modifier = Modifier.padding(end = 10.dp), tint = Color.Gray)
                 }
-            }
+            },
+            border = AssistChipDefaults.assistChipBorder(
+                borderColor = Color.White,
+                borderWidth = 1.dp,
+            )
         )
         DropdownMenu(
             expanded = expanded,

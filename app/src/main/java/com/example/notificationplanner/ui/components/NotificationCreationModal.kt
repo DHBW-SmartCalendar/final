@@ -11,6 +11,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -26,7 +27,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
@@ -36,9 +36,9 @@ import com.example.notificationplanner.data.NotificationType
 import com.example.notificationplanner.data.db.NotificationConfigRepository
 import com.example.notificationplanner.jobs.SyncScheduledNotificationsJob
 import com.example.notificationplanner.ui.form.*
-import com.example.notificationplanner.ui.theme.Red40
 import com.example.notificationplanner.utils.IntentProvider
 import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.time.TimePickerDefaults
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.*
@@ -103,11 +103,12 @@ fun NotificationCreationModal(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
+                    .padding(top = 15.dp, end = 15.dp, bottom = 25.dp, start = 15.dp)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 10.dp, end = 10.dp),
+                        .padding(bottom = 10.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     IconButton(onClick = { onClose() }) {
@@ -144,114 +145,193 @@ fun NotificationCreationModal(
                         )
                     }
                 }
-                Text(
-                    text = "Create Notification",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(start = 10.dp, bottom = 10.dp)
-                )
-                Divider(thickness = 2.dp, modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 20.dp))
 
-                Text(
-                    text = "Notify if ...",
-                    style = MaterialTheme.typography.titleLarge.plus(
-                        TextStyle(
-                            fontSize = 18.sp
+                Surface(
+                    shape = RoundedCornerShape(10),
+                    shadowElevation = 6.dp,
+                    color = MaterialTheme.colorScheme.secondary
+                ) {
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 20.dp, end = 20.dp, bottom = 10.dp, start = 20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+
+                        Text(
+                            text = "Create Notification",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(bottom = 10.dp)
                         )
-                    ),
-                    modifier = Modifier.padding(start = 25.dp, bottom = 5.dp)
-                )
-                Divider(thickness = 1.dp, modifier = Modifier.padding(start = 25.dp, end = 10.dp, bottom = 10.dp))
+
+                        Spacer(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 20.dp)
+                        )
 
 
-                // Listener Selection
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    FilterChip(
-                        onClick = {
-                            alarmClockSelected = !alarmClockSelected
-                        },
-                        modifier = Modifier,
-                        label = {
-                            Text(text = "Alarm Clock")
-                        },
-                        leadingIcon = {
-                            Icon(painter = painterResource(id = R.drawable.alarm), contentDescription = "alarm icon")
-                        },
-                        selected = alarmClockSelected
+                        Text(
+                            text = "Notify when:",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier
+                                .padding(bottom = 5.dp)
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Start
 
-                    )
-                    FilterChip(
-                        onClick = {
-                            if (!ownTimeSelected) {
-                                timePickerDialogState.show()
+                        )
+
+
+                        // Listener Selection
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            FilterChip(
+                                onClick = {
+                                    alarmClockSelected = !alarmClockSelected
+                                },
+                                modifier = Modifier,
+                                label = {
+                                    Text(text = "Alarm Clock")
+                                },
+                                leadingIcon = {
+                                    Icon(painter = painterResource(id = R.drawable.alarm), contentDescription = "alarm icon")
+                                },
+                                selected = alarmClockSelected,
+                                border = FilterChipDefaults.filterChipBorder(
+                                    selectedBorderColor = Color.Black,
+                                    selectedBorderWidth = 1.dp,
+                                    borderColor = MaterialTheme.colorScheme.onSecondary,
+                                    borderWidth = 2.dp
+                                ),
+                                colors = FilterChipDefaults.filterChipColors(
+                                    containerColor = MaterialTheme.colorScheme.secondary,
+                                    selectedContainerColor = MaterialTheme.colorScheme.onSecondary
+                                )
+
+
+                            )
+                            FilterChip(
+                                onClick = {
+                                    if (!ownTimeSelected) {
+                                        timePickerDialogState.show()
+                                    }
+                                    ownTimeSelected = !ownTimeSelected
+                                },
+                                modifier = Modifier,
+                                label = {
+                                    if (ownTimeSelected) {
+                                        Text(text = formattedTime)
+                                    } else {
+                                        Text(text = "Daily")
+                                    }
+                                },
+                                leadingIcon = {
+                                    Icon(painter = painterResource(id = R.drawable.stopwatch), contentDescription = "alarm icon")
+                                },
+                                selected = ownTimeSelected,
+                                border = FilterChipDefaults.filterChipBorder(
+                                    selectedBorderColor = Color.Black,
+                                    selectedBorderWidth = 1.dp,
+                                    borderColor = MaterialTheme.colorScheme.onSecondary,
+                                    borderWidth = 2.dp
+                                ),
+                                colors = FilterChipDefaults.filterChipColors(
+                                    containerColor = MaterialTheme.colorScheme.secondary,
+                                    selectedContainerColor = MaterialTheme.colorScheme.onSecondary
+                                )
+                            )
+                        }
+
+
+                        MaterialDialog(
+                            dialogState = timePickerDialogState,
+                            onCloseRequest = { timePickerDialogState.hide() },
+                            buttons = {
+                                positiveButton(text = "Ok", onClick = { currentNotificationConfig.timerTime = pickedTime.toString() }, textStyle = TextStyle(color = Color.Black))
+                                negativeButton(text = "Cancel", onClick = { ownTimeSelected = false }, textStyle = TextStyle(color = Color.Black))
                             }
-                            ownTimeSelected = !ownTimeSelected
-                        },
-                        modifier = Modifier,
-                        label = {
-                            if (ownTimeSelected) {
-                                Text(text = formattedTime)
-                            } else {
-                                Text(text = "Daily")
+                        ) {
+                            timepicker(
+                                initialTime = pickedTime,
+                                title = " ",
+                                is24HourClock = true,
+                                colors = TimePickerDefaults.colors(
+                                    activeBackgroundColor = MaterialTheme.colorScheme.secondary,
+                                    selectorColor = MaterialTheme.colorScheme.onSecondary,
+                                )
+                            ) {
+                                pickedTime = it
                             }
-                        },
-                        leadingIcon = {
-                            Icon(painter = painterResource(id = R.drawable.stopwatch), contentDescription = "alarm icon")
-                        },
-                        selected = ownTimeSelected
-                    )
-                }
-                Spacer(modifier = Modifier.height(10.dp))
+                        }
+                        Divider(
+                            thickness = 1.dp,
+                            modifier = Modifier
+                                .padding(top = 10.dp, bottom = 20.dp, start = 10.dp, end = 10.dp),
+                            color = Color.Black
+                        )
+                        Text(
+                            text = "Topic:",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier
+                                .padding(bottom = 15.dp)
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Start
+                        )
 
-                MaterialDialog(
-                    dialogState = timePickerDialogState,
-                    onCloseRequest = { timePickerDialogState.hide() },
-                    buttons = {
-                        positiveButton(text = "Ok", onClick = { currentNotificationConfig.timerTime = pickedTime.toString() })
-                        negativeButton(text = "Cancel", onClick = { ownTimeSelected = false })
-                    }
-                ) {
-                    timepicker(
-                        initialTime = pickedTime,
-                        title = "Pick a time",
-                        is24HourClock = true
-                    ) {
-                        pickedTime = it
-                    }
-                }
+                        DropDownMenu(items =NotificationType.values().asList(), onSelectionChanged = {
+                            currentNotificationType = it
+                        })
+                        Divider(
+                            thickness = 1.dp,
+                            modifier = Modifier
+                                .padding(top = 20.dp, bottom = 20.dp, start = 10.dp, end = 10.dp),
+                            color = Color.Black
+                        )
+                        Text(
+                            text = "Options:",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier
+                                .padding(bottom = 5.dp)
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Start
+                        )
 
-                DropDownMenu(NotificationType.values().asList(), onSelectionChanged = {
-                    currentNotificationType = it
-                })
 
-                when (currentNotificationType) {
-                    NotificationType.WEATHER -> WeatherForm(currentNotificationConfig)
-                    NotificationType.NEWS -> NewsForm()
-                    NotificationType.CALENDAR -> CalendarForm()
-                    NotificationType.MEME -> MemeForm()
-                    NotificationType.EXCUSE -> ExcusesForm(currentNotificationConfig)
-                }
+                        when (currentNotificationType) {
+                            NotificationType.WEATHER -> WeatherForm(currentNotificationConfig)
+                            NotificationType.NEWS -> NewsForm()
+                            NotificationType.CALENDAR -> CalendarForm()
+                            NotificationType.MEME -> MemeForm()
+                            NotificationType.EXCUSE -> ExcusesForm(currentNotificationConfig)
+                        }
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(10.dp),
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.Bottom
-                )
-                {
-                    if (isEditing) Button(
-                        modifier = Modifier,
-                        onClick = {
-                            delete(notificationConfig!!, context)
-                            onClose()
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Red40)
-                    ) {
-                        Icon(imageVector = Icons.Default.Delete, contentDescription = null, tint = Color.Black)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(10.dp),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Bottom
+                        )
+                        {
+                            if (isEditing) IconButton(
+                                onClick = {
+                                    delete(notificationConfig!!, context)
+                                    onClose()
+                                },
+                                colors = IconButtonDefaults.iconButtonColors()
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = null,
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(45.dp, 45.dp),
+                                )
+                            }
+                        }
                     }
                 }
             }

@@ -29,7 +29,7 @@ fun ExcusesForm (notificationConfig: NotificationConfig){
     Column(modifier = Modifier.padding(20.dp),){
 
         Text(text ="Choose excuse category", modifier = Modifier.align(alignment = Alignment.CenterHorizontally))
-        DropDownMenu(Excuse_Category.values().asList(), onSelectionChanged = {
+        DropDownMenu(items = Excuse_Category.values().asList(), onSelectionChanged = {
             category = it
         })
 

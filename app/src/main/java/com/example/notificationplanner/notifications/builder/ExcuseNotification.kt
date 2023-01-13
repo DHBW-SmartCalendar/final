@@ -10,7 +10,6 @@ import com.example.notificationplanner.R
 import com.example.notificationplanner.data.NotificationConfig
 import com.example.notificationplanner.exception.ExceptionNotification
 import com.example.notificationplanner.externAPI.json.excuses.Excuse
-import com.example.notificationplanner.externAPI.json.excuses.ExcuseItem
 import com.example.notificationplanner.notifications.NotificationService
 import com.example.notificationplanner.utils.NotificationsConditions
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -24,9 +23,6 @@ class ExcuseNotification : BroadcastReceiver() {
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent?) {
-        println("WORKS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        // TODO implement api function to get excuses -> ApiCollection
-        // use WeatherNotification as reference for implementing this notification
 
         val uid = intent?.getIntExtra("uid", -1)
         Log.d(this@ExcuseNotification.javaClass.name, "Received Intent with : Extra $uid")
@@ -34,16 +30,13 @@ class ExcuseNotification : BroadcastReceiver() {
         NotificationsConditions.check(context, uid!!) { api, config ->
             GlobalScope.launch(Dispatchers.IO) {
                 val response = api.getExcuse(config.excuses_category.toString().toLowerCase(), config.excuses_amount)
-                println("RESPONSE: " + response)
-                Log.d(this@ExcuseNotification::class.java.name,"HERE RESPONSE !!!!!!!!!!!!!!: $response")
                 if (response.isSuccessful) {
                     Log.d(this@ExcuseNotification::class.java.name, "Excuse Api request was successful")
-                    val excuse = getExcuse(response.body()!!)
 
                     val notification = NotificationCompat.Builder(context, NotificationService.PLANNER_CHANNEL_ID)
                         .setSmallIcon(R.drawable.img_da)
-                        .setContentTitle("Excuse")
-                        .setStyle(NotificationCompat.BigTextStyle().bigText(getExcuseString(config, excuse!!)))
+                        .setContentTitle("Excuses")
+                        .setStyle(NotificationCompat.BigTextStyle().bigText(getExcuseString(config, response.body()!!)))
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .build()
 
@@ -59,16 +52,13 @@ class ExcuseNotification : BroadcastReceiver() {
         }
     }
 
-    private fun getExcuse(excuseItem: ExcuseItem): Excuse{
-        val excuse1: Excuse = Excuse()
-        excuse1.add(excuseItem)
-        return excuse1
-    }
-
     private fun getExcuseString(config: NotificationConfig, excuse: Excuse): String{
         val str = buildString {
-            append("Category        : \n")
-            append("Excuse          : \n")
+            var temp = 1
+            excuse.forEach{
+                append("" + temp + ". " + it.excuse + "\n")
+                temp++
+            }
         }
         return str
     }

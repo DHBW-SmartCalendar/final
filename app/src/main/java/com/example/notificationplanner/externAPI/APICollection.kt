@@ -1,6 +1,6 @@
 package com.example.notificationplanner.externAPI
 
-import com.example.notificationplanner.externAPI.json.excuses.ExcuseItem
+import com.example.notificationplanner.externAPI.json.excuses.Excuse
 import com.example.notificationplanner.externAPI.json.weather.WeatherInformation
 import retrofit2.Response
 import retrofit2.http.GET
@@ -20,5 +20,5 @@ interface APICollection {
     suspend fun getExcuse(
         @Path("category") category: String,
         @Path("amount") amount: Int
-    ): Response<ExcuseItem>
+    ): Response<Excuse>
 }

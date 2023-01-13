@@ -16,14 +16,8 @@ import com.example.notificationplanner.ui.components.DropDownMenu
 
 @Composable
 fun ExcusesForm (notificationConfig: NotificationConfig){
-    // TODO Heading
-// TODO first do todo 2 in NotificationConfig Class (the enum needs to implement DropDownCompatible interface)
-// TODO implement Dropdown for excuse category (use States / on change : updating of data object is required) use NotificationType DropDown in NotificationCreationModal as Reference
-// TODO implement slider for article amount (use States / on change : updating of data object is required) use WeatherForm as reference
 
-    //var excuse_CategoryTemp = ""
     var category by remember { mutableStateOf(notificationConfig.excuses_category) }
-    var amount by remember { mutableStateOf(notificationConfig.excuses_amount) }
     var sliderPosition by remember { mutableStateOf(1f) }
 
     Column(modifier = Modifier.padding(20.dp),){
@@ -44,14 +38,15 @@ fun ExcusesForm (notificationConfig: NotificationConfig){
             Excuse_Category.DEVELOPERS -> category = Excuse_Category.DEVELOPERS
             Excuse_Category.GAMING -> category = Excuse_Category.GAMING
         }
+        notificationConfig.excuses_category = category
 
         Text(text ="Choose amount of excuses", modifier = Modifier.align(alignment = Alignment.CenterHorizontally))
         Slider(
             value = sliderPosition,
             modifier = Modifier.padding(15.dp),
-            valueRange = 1f..10f,
-            steps = 8,
-            onValueChange = {sliderPosition = it; amount = it.toInt() },
+            valueRange = 1f..5f,
+            steps = 3,
+            onValueChange = {sliderPosition = it; notificationConfig.excuses_amount = it.toInt() },
             colors = SliderDefaults.colors(Color.Blue)
         )
         Text(text= sliderPosition.toInt().toString(), modifier = Modifier.align(alignment = Alignment.CenterHorizontally))

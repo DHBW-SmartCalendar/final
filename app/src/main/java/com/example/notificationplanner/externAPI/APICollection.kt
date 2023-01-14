@@ -1,6 +1,7 @@
 package com.example.notificationplanner.externAPI
 
 import com.example.notificationplanner.externAPI.json.excuses.Excuse
+import com.example.notificationplanner.externAPI.json.news.News
 import com.example.notificationplanner.externAPI.json.weather.WeatherInformation
 import retrofit2.Response
 import retrofit2.http.GET
@@ -21,4 +22,11 @@ interface APICollection {
         @Path("category") category: String,
         @Path("amount") amount: Int
     ): Response<Excuse>
+
+    @GET("top-headlines")
+    suspend fun getNews(
+        @Query("category") category: String = "health",
+        @Query("country") country: String = "us",
+        @Query("apiKey") apiKey: String = "61d9c36a22d64a57a58473bcd131aa04",
+    ): Response<News>
 }

@@ -48,6 +48,7 @@
         <receiver android:name=".jobs.SyncScheduledNotificationsJob" />
         <receiver android:name=".notifications.builder.WeatherNotification" />
         <receiver android:name=".notifications.builder.ExcuseNotification" />
+        <receiver android:name=".notifications.builder.NewsNotification" />
 
         <receiver
             android:name=".jobs.OnNextAlarmClockChangedReceiver"

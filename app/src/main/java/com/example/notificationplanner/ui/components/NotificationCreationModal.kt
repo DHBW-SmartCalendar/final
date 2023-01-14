@@ -303,7 +303,7 @@ fun NotificationCreationModal(
 
                         when (currentNotificationType) {
                             NotificationType.WEATHER -> WeatherForm(currentNotificationConfig)
-                            NotificationType.NEWS -> NewsForm()
+                            NotificationType.NEWS -> NewsForm(currentNotificationConfig)
                             NotificationType.CALENDAR -> CalendarForm()
                             NotificationType.MEME -> MemeForm()
                             NotificationType.EXCUSE -> ExcusesForm(currentNotificationConfig)

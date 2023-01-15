@@ -59,7 +59,7 @@ fun NotificationPlannerTheme(
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            (view.context as Activity).window.statusBarColor = colorScheme.tertiary.toArgb()
+            (view.context as Activity).window.statusBarColor = colorScheme.onSecondary.toArgb()
             ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
         }
     }

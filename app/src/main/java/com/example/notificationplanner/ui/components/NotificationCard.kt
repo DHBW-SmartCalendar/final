@@ -63,13 +63,15 @@ fun NotificationCard(
         modifier = Modifier
             .fillMaxWidth(0.9f)
             .then(modifier),
+        shape = RoundedCornerShape(20),
 
         colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = MaterialTheme.colorScheme.secondary,
         ),
         elevation = CardDefaults.elevatedCardElevation(
             defaultElevation = 20.dp,
-            hoveredElevation = 25.dp
+            hoveredElevation = 25.dp,
+            pressedElevation = 30.dp
         )
     ) {
 
@@ -83,12 +85,11 @@ fun NotificationCard(
             horizontalArrangement = Arrangement.End
         ) {
             Text(
-                text = configState.type?.description!!,
+                text = configState.type.description,
                 modifier = Modifier
-                    .padding(20.dp)
+                    .padding(15.dp)
                     .weight(4f),
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.Black
+                style = MaterialTheme.typography.displayMedium,
             )
             Switch(
                 checked = isChecked,
@@ -104,24 +105,24 @@ fun NotificationCard(
                     }
                 },
                 modifier = Modifier
-                    .padding(5.dp)
+                    .padding(top = 6.dp, end = 6.dp)
                     .weight(1f),
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = Color(0xFFFFFEFE),
-                    checkedTrackColor = Color(0xFF2DD158),
-                    checkedBorderColor = Color(0xFF2DD158),
                     uncheckedThumbColor = Color(0xFFFFFEFE),
-                    uncheckedTrackColor = if (isSystemInDarkTheme()) Color(0xFF393A3D) else Color(0xFFE8E9EB),
-                    uncheckedBorderColor = if (isSystemInDarkTheme()) Color(0xFF393A3D) else Color(0xFFE8E9EB)
+                    checkedTrackColor = MaterialTheme.colorScheme.onSecondary,
+                    uncheckedTrackColor = Color(0xFF9E948D),
+                    checkedBorderColor = MaterialTheme.colorScheme.onSecondary,
+                    uncheckedBorderColor = Color(0xFF9E948D)
                 )
             )
 
 
         }
-        Divider(thickness = 1.dp, modifier = Modifier.padding(start = 10.dp, end = 10.dp))
+        Divider(thickness = 2.dp, modifier = Modifier.padding(start = 10.dp, end = 100.dp), color = Color.White)
         LazyRow(
             modifier = Modifier
-                .padding(10.dp)
+                .padding(top = 10.dp, bottom = 12.dp, start = 12.dp, end = 12.dp)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.Bottom
@@ -131,10 +132,10 @@ fun NotificationCard(
             item {
                 IconButton(
                     onClick = { onEditRequest() }, modifier = Modifier
-                        .border(1.dp, Color.Gray, RoundedCornerShape(20))
+                        .border(1.dp, Color.White, RoundedCornerShape(20))
                         .size(35.dp, 35.dp)
                 ) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = null, tint = Color.Gray)
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = null, tint = Color.White)
 
                 }
 
@@ -143,21 +144,14 @@ fun NotificationCard(
                 if (configState.listenOnOwnTimer && configState.timerTime != null) DigitalClock(
                     time = configState.timerTime!!,
                     height = 25,
-                    modifier = Modifier.padding(bottom = 2.dp)
+                    //modifier = Modifier.padding(bottom = 2.dp)
                 )
                 if (configState.listenOnAlarm) Icon(
                     painter = painterResource(id = R.drawable.alarm), contentDescription = null,
                     modifier = Modifier
-                        .size(30.dp, 30.dp)
-                        .padding(start = 10.dp),
-                    tint = Color.Black
-                )
-                if (configState.listenOnCalendar) Icon(
-                    painter = painterResource(id = R.drawable.calendar), contentDescription = null,
-                    modifier = Modifier
-                        .size(30.dp, 30.dp)
-                        .padding(start = 10.dp),
-                    tint = Color.Black
+                        .size(32.dp, 32.dp)
+                        .padding(start = 10.dp, top=4.dp),
+                    tint = Color.White
                 )
             }
         }

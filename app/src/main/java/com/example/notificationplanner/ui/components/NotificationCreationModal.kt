@@ -327,7 +327,7 @@ fun NotificationCreationModal(
                                 Icon(
                                     imageVector = Icons.Default.Delete,
                                     contentDescription = null,
-                                    tint = Color.Black,
+                                    tint = MaterialTheme.colorScheme.onSecondary,
                                     modifier = Modifier.size(45.dp, 45.dp),
                                 )
                             }

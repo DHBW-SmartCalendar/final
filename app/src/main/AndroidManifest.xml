@@ -16,7 +16,7 @@
         android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/keiho_icon_1"
-        android:label="NPlanner"
+        android:label="KEIHO"
         android:roundIcon="@mipmap/keiho_icon_1_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NotificationPlanner"

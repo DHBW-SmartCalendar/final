@@ -27,7 +27,7 @@ fun DigitalClock(
     Box(
         modifier = Modifier
             .size(height = height.dp, width = (2 * height).dp)
-            .border(1.dp, Color.Black, RoundedCornerShape(25))
+            .border(1.dp, Color.White, RoundedCornerShape(25))
             .then(modifier),
         contentAlignment = Alignment.Center
     ) {
@@ -35,7 +35,7 @@ fun DigitalClock(
             text = time,
             fontFamily = FontFamily.Monospace,
             fontSize = 14.sp,
-            color = Color.Black
+            color = Color.White
 
         )
     }

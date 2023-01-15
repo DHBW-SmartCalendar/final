@@ -33,6 +33,22 @@ val Typography = Typography(
         letterSpacing = 0.5.sp,
         color = Color.Black
     ),
+    displayMedium = TextStyle(
+        fontFamily = FontFamily.Monospace,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.5.sp,
+        color = Color.White
+    ),
+    headlineLarge = TextStyle(
+        fontFamily = FontFamily.Monospace,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.5.sp,
+        color = Color.White
+    ),
     /* Other default text styles to override
     labelSmall = TextStyle(
         fontFamily = FontFamily.Default,

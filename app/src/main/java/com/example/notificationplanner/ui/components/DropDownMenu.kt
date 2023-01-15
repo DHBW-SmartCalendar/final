@@ -19,17 +19,19 @@ fun <T : DropDownCompatible> DropDownMenu(
     modifier: Modifier = Modifier,
     items: List<T>,
     onSelectionChanged: (T) -> Unit,
-    placeholder: String? = null,
+    placeholder: String? = "",
+    selected: T? = null
 
 ) {
     val width = LocalConfiguration.current.screenWidthDp - (LocalConfiguration.current.screenWidthDp * 0.2)
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf(placeholder ?: items.first().getLabelText()) }
+    var selectedText by remember { mutableStateOf(selected?.getLabelText() ?: placeholder) }
     val icon by remember {
         derivedStateOf {
             if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
         }
     }
+
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         AssistChip(
             onClick = { expanded = !expanded },
@@ -37,7 +39,7 @@ fun <T : DropDownCompatible> DropDownMenu(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp),
-            label = { Text(text = selectedText, modifier = Modifier.padding(start = 5.dp)) },
+            label = { Text(text = selectedText.toString(), modifier = Modifier.padding(start = 5.dp)) },
             trailingIcon = {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     Icon(icon, "contentDescription", modifier = Modifier.padding(end = 10.dp), tint = Color.Gray)

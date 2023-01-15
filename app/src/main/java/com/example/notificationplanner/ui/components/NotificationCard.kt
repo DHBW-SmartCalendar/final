@@ -7,7 +7,6 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.example.notificationplanner.R
 import com.example.notificationplanner.data.NotificationConfig
+import com.example.notificationplanner.data.NotificationType
 import com.example.notificationplanner.data.db.NotificationConfigRepository
 import com.example.notificationplanner.jobs.SyncScheduledNotificationsJob
 import com.example.notificationplanner.utils.IntentProvider
@@ -85,7 +85,13 @@ fun NotificationCard(
             horizontalArrangement = Arrangement.End
         ) {
             Text(
-                text = configState.type.description,
+                text = configState.type.description + " "
+                        + when (configState.type) {
+                    NotificationType.NEWS -> configState.news_category.getLabelText()
+                    else -> {
+                        " "
+                    }
+                },
                 modifier = Modifier
                     .padding(15.dp)
                     .weight(4f),
@@ -150,7 +156,7 @@ fun NotificationCard(
                     painter = painterResource(id = R.drawable.alarm), contentDescription = null,
                     modifier = Modifier
                         .size(32.dp, 32.dp)
-                        .padding(start = 10.dp, top=4.dp),
+                        .padding(start = 10.dp, top = 4.dp),
                     tint = Color.White
                 )
             }

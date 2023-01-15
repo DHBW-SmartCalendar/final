@@ -132,7 +132,10 @@ fun NotificationCreationModal(
                                 currentNotificationConfig.isActive = true
                             }
                             save(currentNotificationConfig, context)
+
                             println("YOUR NOTIFICATION:  $currentNotificationConfig")
+                            println(currentNotificationConfig.news_category.description)
+                            println(currentNotificationConfig.news_amount)
                             IntentProvider.pendingIntentBroadcast(context, 999999, SyncScheduledNotificationsJob::class.java).send()
                             onClose()
 
@@ -251,7 +254,11 @@ fun NotificationCreationModal(
                             dialogState = timePickerDialogState,
                             onCloseRequest = { timePickerDialogState.hide() },
                             buttons = {
-                                positiveButton(text = "Ok", onClick = { currentNotificationConfig.timerTime = pickedTime.toString() }, textStyle = TextStyle(color = Color.Black))
+                                positiveButton(
+                                    text = "Ok",
+                                    onClick = { currentNotificationConfig.timerTime = pickedTime.toString() },
+                                    textStyle = TextStyle(color = Color.Black)
+                                )
                                 negativeButton(text = "Cancel", onClick = { ownTimeSelected = false }, textStyle = TextStyle(color = Color.Black))
                             }
                         ) {
@@ -282,9 +289,10 @@ fun NotificationCreationModal(
                             textAlign = TextAlign.Start
                         )
 
-                        DropDownMenu(items =NotificationType.values().asList(), onSelectionChanged = {
+                        DropDownMenu(items = NotificationType.values().asList(), onSelectionChanged = {
                             currentNotificationType = it
-                        })
+                            println(it)
+                        }, selected = currentNotificationType)
                         Divider(
                             thickness = 1.dp,
                             modifier = Modifier

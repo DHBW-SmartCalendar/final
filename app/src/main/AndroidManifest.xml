@@ -21,15 +21,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NotificationPlanner"
         tools:targetApi="tiramisu">
-        <activity
-            android:name=".SecondActivity"
-            android:exported="false"
-            android:label="@string/title_activity_test"
-            android:theme="@style/Theme.NotificationPlanner">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

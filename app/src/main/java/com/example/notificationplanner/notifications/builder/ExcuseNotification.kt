@@ -1,5 +1,6 @@
 package com.example.notificationplanner.notifications.builder
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -21,6 +22,7 @@ import kotlinx.coroutines.*
 
 class ExcuseNotification : BroadcastReceiver() {
 
+    @SuppressLint("MissingPermission")
     @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent?) {
 
@@ -29,12 +31,12 @@ class ExcuseNotification : BroadcastReceiver() {
 
         NotificationsConditions.check(context, uid!!) { api, config ->
             GlobalScope.launch(Dispatchers.IO) {
-                val response = api.getExcuse(config.excuses_category.toString().toLowerCase(), config.excuses_amount)
+                val response = api.getExcuse(config.excuses_category.toString().lowercase(), config.excuses_amount)
                 if (response.isSuccessful) {
                     Log.d(this@ExcuseNotification::class.java.name, "Excuse Api request was successful")
 
                     val notification = NotificationCompat.Builder(context, NotificationService.PLANNER_CHANNEL_ID)
-                        .setSmallIcon(R.drawable.img_da)
+                        .setSmallIcon(R.drawable.keiho_icon)
                         .setContentTitle("Excuses")
                         .setStyle(NotificationCompat.BigTextStyle().bigText(getExcuseString(config, response.body()!!)))
                         .setPriority(NotificationCompat.PRIORITY_HIGH)

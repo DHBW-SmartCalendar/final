@@ -19,7 +19,7 @@ fun <T : DropDownCompatible> DropDownMenu(
     modifier: Modifier = Modifier,
     items: List<T>,
     onSelectionChanged: (T) -> Unit,
-    placeholder: String? = "",
+    placeholder: String? = "Choose",
     selected: T? = null
 
 ) {

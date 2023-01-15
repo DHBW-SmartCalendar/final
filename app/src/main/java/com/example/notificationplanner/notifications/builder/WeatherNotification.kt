@@ -1,5 +1,6 @@
 package com.example.notificationplanner.notifications.builder
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -19,6 +20,7 @@ import java.time.format.DateTimeFormatter
 
 class WeatherNotification : BroadcastReceiver() {
 
+    @SuppressLint("MissingPermission")
     @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent?) {
         println("Starts WheatherNotifcation")

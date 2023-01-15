@@ -26,7 +26,7 @@ interface APICollection {
     @GET("top-headlines")
     suspend fun getNews(
         @Query("category") category: String = "health",
-        @Query("country") country: String = "us",
+        @Query("country") country: String = "de",
         @Query("apiKey") apiKey: String = "61d9c36a22d64a57a58473bcd131aa04",
     ): Response<News>
 }

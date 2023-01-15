@@ -54,15 +54,25 @@ class SyncScheduledNotificationsJob : BroadcastReceiver() {
                         if (config.listenOnAlarm) {
                             val notificationIntent = IntentProvider.pendingIntentBroadcast(context, config)
                             alarmManager.nextAlarmClock?.let {
-                                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, it.triggerTime, notificationIntent)
+
+                                if (config.timerTime == null) {
+                                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, it.triggerTime, notificationIntent)
+                                } else if (getUnixMillis(config.timerTime) > it.triggerTime) {
+                                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, it.triggerTime, notificationIntent)
+                                }
+
                                 Log.d(
                                     this@SyncScheduledNotificationsJob.javaClass.name,
                                     "Scheduled successful notification (listen for alarm clock) for :: ${millisToLocalDateTime(it.triggerTime)} in Millis ${it.triggerTime}"
                                 )
                             } ?: run {
-                                alarmManager.cancel(notificationIntent)
-                                Log.d(this@SyncScheduledNotificationsJob.javaClass.name, "Canceled :: ${config.uid} , because alarm was turned off")
-
+                                if (!config.listenOnOwnTimer) {
+                                    alarmManager.cancel(notificationIntent)
+                                    Log.d(
+                                        this@SyncScheduledNotificationsJob.javaClass.name,
+                                        "Canceled :: ${config.uid} , because alarm was turned off"
+                                    )
+                                }
                             }
                         }
                     } else {
@@ -93,7 +103,8 @@ class SyncScheduledNotificationsJob : BroadcastReceiver() {
     private fun millisToLocalDateTime(millis: Long): LocalDateTime {
         return Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDateTime()
     }
-    companion object{
+
+    companion object {
         private const val DAY: Long = 86400000
 
         fun registerDailySync(context: Context) {

@@ -20,6 +20,7 @@
         android:roundIcon="@mipmap/keiho_icon_1_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NotificationPlanner"
+        android:usesCleartextTraffic="true"
         tools:targetApi="tiramisu">
 
         <activity
@@ -41,6 +42,7 @@
         <receiver android:name=".notifications.builder.WeatherNotification" />
         <receiver android:name=".notifications.builder.ExcuseNotification" />
         <receiver android:name=".notifications.builder.NewsNotification" />
+        <receiver android:name=".notifications.builder.MemeNotification" />
 
         <receiver
             android:name=".jobs.OnNextAlarmClockChangedReceiver"

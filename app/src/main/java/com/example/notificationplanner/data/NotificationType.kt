@@ -14,7 +14,7 @@ enum class NotificationType( val description: String, val url: String? = null) :
            return description
         }
     },
-    MEME("Random Meme", "https://meme-api.herokuapp.com/") { //gimme
+    MEME("Random Meme", "https://meme-api.com/") { //gimme
         override fun getLabelText(): String {
            return description
         }

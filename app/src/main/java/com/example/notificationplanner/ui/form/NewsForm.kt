@@ -39,4 +39,3 @@ fun NewsForm(notificationConfig: NotificationConfig) {
         Text(text = sliderPosition.toInt().toString(), modifier = Modifier.align(alignment = Alignment.CenterHorizontally))
     }
 }
-

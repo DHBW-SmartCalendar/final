@@ -10,9 +10,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.notificationplanner.R
-import com.example.notificationplanner.data.NotificationConfig
 import com.example.notificationplanner.exception.ExceptionNotification
-import com.example.notificationplanner.externAPI.json.news.News
 import com.example.notificationplanner.notifications.NotificationService
 import com.example.notificationplanner.utils.NotificationsConditions
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -61,12 +59,6 @@ class NewsNotification : BroadcastReceiver() {
                     with(NotificationManagerCompat.from(context)) {
                         notify(20, summaryNotification)
                     }
-
-
-
-
-
-
                     Log.d(this@NewsNotification::class.java.name, "Notification sent finally -> config uid : $uid")
                 } else {
                     Log.e(this@NewsNotification.javaClass.name, "Api call failure ")
@@ -74,15 +66,5 @@ class NewsNotification : BroadcastReceiver() {
                 }
             }
         }
-    }
-
-
-    private fun getNewsString(config: NotificationConfig, news: News): String {
-        val str = buildString {
-            for (index in 0 until config.excuses_amount + 1) {
-                append("" + news.articles[index].title + "\n \n")
-            }
-        }
-        return str
     }
 }

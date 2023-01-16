@@ -1,6 +1,7 @@
 package com.example.notificationplanner.externAPI
 
 import com.example.notificationplanner.externAPI.json.excuses.Excuse
+import com.example.notificationplanner.externAPI.json.meme.Meme
 import com.example.notificationplanner.externAPI.json.news.News
 import com.example.notificationplanner.externAPI.json.weather.WeatherInformation
 import retrofit2.Response
@@ -29,4 +30,9 @@ interface APICollection {
         @Query("country") country: String = "de",
         @Query("apiKey") apiKey: String = "61d9c36a22d64a57a58473bcd131aa04",
     ): Response<News>
+
+    @GET("gimme/{count}")
+    suspend fun getMeme(
+        @Path("count") count: Int
+    ): Response<Meme>
 }

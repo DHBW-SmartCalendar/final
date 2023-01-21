@@ -15,13 +15,17 @@ import coil.request.SuccessResult
 import com.example.notificationplanner.R
 import com.example.notificationplanner.exception.ExceptionNotification
 import com.example.notificationplanner.externAPI.json.meme.Meme
+import com.example.notificationplanner.jobs.SyncScheduledNotificationsJob
 import com.example.notificationplanner.notifications.NotificationService
+import com.example.notificationplanner.utils.IntentProvider
 import com.example.notificationplanner.utils.NotificationsConditions
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class MemeNotification : BroadcastReceiver() {
+    @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context, intent: Intent?) {
 
@@ -51,6 +55,7 @@ class MemeNotification : BroadcastReceiver() {
                 }
             }
         }
+        IntentProvider.pendingIntentBroadcast(context, 999999, SyncScheduledNotificationsJob::class.java).send()
     }
 
     private suspend fun getMemePicture(meme: Meme, context: Context): Bitmap {

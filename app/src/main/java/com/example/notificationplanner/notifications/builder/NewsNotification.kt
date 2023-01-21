@@ -11,7 +11,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.notificationplanner.R
 import com.example.notificationplanner.exception.ExceptionNotification
+import com.example.notificationplanner.jobs.SyncScheduledNotificationsJob
 import com.example.notificationplanner.notifications.NotificationService
+import com.example.notificationplanner.utils.IntentProvider
 import com.example.notificationplanner.utils.NotificationsConditions
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -66,5 +68,6 @@ class NewsNotification : BroadcastReceiver() {
                 }
             }
         }
+        IntentProvider.pendingIntentBroadcast(context, 999999, SyncScheduledNotificationsJob::class.java).send()
     }
 }

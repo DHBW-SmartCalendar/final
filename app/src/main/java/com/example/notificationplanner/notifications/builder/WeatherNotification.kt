@@ -12,7 +12,9 @@ import com.example.notificationplanner.data.NotificationConfig
 import com.example.notificationplanner.exception.ExceptionNotification
 import com.example.notificationplanner.externAPI.json.weather.Weather
 import com.example.notificationplanner.externAPI.json.weather.WeatherInformation
+import com.example.notificationplanner.jobs.SyncScheduledNotificationsJob
 import com.example.notificationplanner.notifications.NotificationService
+import com.example.notificationplanner.utils.IntentProvider
 import com.example.notificationplanner.utils.LocationProvider
 import com.example.notificationplanner.utils.NotificationsConditions
 import kotlinx.coroutines.*
@@ -63,6 +65,7 @@ class WeatherNotification : BroadcastReceiver() {
                 }
             }
         }
+        IntentProvider.pendingIntentBroadcast(context, 999999, SyncScheduledNotificationsJob::class.java).send()
     }
 
     private fun getCurrentWeather(weatherInformation: WeatherInformation): Weather? {

@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.notificationplanner.R
 import com.example.notificationplanner.data.NotificationConfig
@@ -51,13 +52,46 @@ fun NotificationCard(
             )
         } else mutableStateOf(true)
     }
+    var hasCoarseLocationPermission by remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            mutableStateOf(
+                ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            )
+        } else mutableStateOf(true)
+    }
+    var hasFineLocationPermission by remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            mutableStateOf(
+                ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            )
+        } else mutableStateOf(true)
+    }
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
             hasNotificationPermission = isGranted
         }
     )
+    val fineLocationLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            hasFineLocationPermission = isGranted
+        }
+    )
+    val coarseLocationLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            hasCoarseLocationPermission = isGranted
+            fineLocationLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
 
+        }
+    )
 
     ElevatedCard(
         modifier = Modifier
@@ -102,6 +136,9 @@ fun NotificationCard(
                 onCheckedChange = {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        if (notificationConfig.type == NotificationType.WEATHER) {
+                            coarseLocationLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                        }
                     }
                     if (hasNotificationPermission) {
                         isChecked = it

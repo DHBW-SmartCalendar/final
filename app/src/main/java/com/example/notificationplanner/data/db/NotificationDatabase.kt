@@ -5,12 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.notificationplanner.data.NotificationConfig
-import com.example.notificationplanner.z_old.ScheduledNotification
-import com.example.notificationplanner.z_old.ScheduledNotificationDAO
 
 @Database(
     entities = [NotificationConfig::class, ],
-    version = 10,
+    version = 11,
     exportSchema = false
 )
 abstract class NotificationDatabase : RoomDatabase() {

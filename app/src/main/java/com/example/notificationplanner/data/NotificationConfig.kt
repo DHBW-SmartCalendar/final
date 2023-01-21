@@ -29,6 +29,7 @@ data class NotificationConfig(
 
     var news_category: NewsCategory = NewsCategory.BUSINESS,
     var news_amount: Int = 1,
+    var news_country: Country = Country.GERMANY,
 
     var excuses_category: Excuse_Category = Excuse_Category.FAMILY,
     var excuses_amount: Int = 1,

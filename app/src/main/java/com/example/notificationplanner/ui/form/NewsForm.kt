@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.notificationplanner.data.Country
 import com.example.notificationplanner.data.NotificationConfig
 import com.example.notificationplanner.externAPI.json.news.NewsCategory
 import com.example.notificationplanner.ui.components.DropDownMenu
@@ -19,13 +20,21 @@ import com.example.notificationplanner.ui.components.DropDownMenu
 fun NewsForm(notificationConfig: NotificationConfig) {
 
     var category by remember { mutableStateOf(notificationConfig.news_category) }
+    var country by remember { mutableStateOf(notificationConfig.news_country) }
     var sliderPosition by remember { mutableStateOf(notificationConfig.news_amount.toFloat()) }
 
     Column {
-        DropDownMenu(modifier = Modifier.padding(bottom = 10.dp), items = NewsCategory.values().asList(), onSelectionChanged = {
+
+        Text(text = "Category", modifier = Modifier.align(alignment = Alignment.CenterHorizontally), color = Color.Black)
+        DropDownMenu(modifier = Modifier.padding(bottom = 10.dp, top = 5.dp), items = NewsCategory.values().asList(), onSelectionChanged = {
             category = it
             notificationConfig.news_category = category
         }, selected = notificationConfig.news_category)
+        Text(text = "Country", modifier = Modifier.align(alignment = Alignment.CenterHorizontally), color = Color.Black)
+        DropDownMenu(modifier = Modifier.padding(bottom = 10.dp, top = 5.dp), items = Country.values().asList(), onSelectionChanged = {
+            country = it
+            notificationConfig.news_country = country
+        }, selected = notificationConfig.news_country)
 
         Text(text = "Article amount", modifier = Modifier.align(alignment = Alignment.CenterHorizontally), color = Color.Black)
         Slider(

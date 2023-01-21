@@ -72,6 +72,16 @@ fun NotificationCard(
             )
         } else mutableStateOf(true)
     }
+    var hasBackgroundLocationPermission by remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            mutableStateOf(
+                ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            )
+        } else mutableStateOf(true)
+    }
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
@@ -90,6 +100,12 @@ fun NotificationCard(
             hasCoarseLocationPermission = isGranted
             fineLocationLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
 
+        }
+    )
+    val backgroundLocationLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            hasBackgroundLocationPermission = isGranted
         }
     )
 
@@ -138,6 +154,7 @@ fun NotificationCard(
                         launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
                         if (notificationConfig.type == NotificationType.WEATHER) {
                             coarseLocationLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                            backgroundLocationLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
                         }
                     }
                     if (hasNotificationPermission) {

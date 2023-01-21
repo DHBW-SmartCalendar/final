@@ -48,7 +48,7 @@ class ExcuseNotification : BroadcastReceiver() {
                     Log.d(this@ExcuseNotification::class.java.name, "Notification sent finally -> config uid : $uid")
                 } else {
                     Log.e(this@ExcuseNotification.javaClass.name, "Api call failure ")
-                    ExceptionNotification.default(context)
+                    ExceptionNotification.sendExceptionNotification(context)
                 }
             }
         }

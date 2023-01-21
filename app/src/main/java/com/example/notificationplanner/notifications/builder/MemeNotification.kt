@@ -1,5 +1,6 @@
 package com.example.notificationplanner.notifications.builder
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -21,6 +22,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class MemeNotification : BroadcastReceiver() {
+    @SuppressLint("MissingPermission")
     override fun onReceive(context: Context, intent: Intent?) {
 
         val uid = intent?.getIntExtra("uid", -1)
@@ -45,7 +47,7 @@ class MemeNotification : BroadcastReceiver() {
                     Log.d(this@MemeNotification::class.java.name, "Notification sent finally -> config uid : $uid")
                 } else {
                     Log.e(this@MemeNotification.javaClass.name, "Api call failure ")
-                    ExceptionNotification.default(context)
+                    ExceptionNotification.sendExceptionNotification(context)
                 }
             }
         }

@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.notificationplanner.R
 import com.example.notificationplanner.data.NotificationConfig
@@ -62,7 +63,7 @@ fun NotificationCreationModal(
             val currentNotificationConfig by remember { mutableStateOf(notificationConfig ?: NotificationConfig()) }
             var currentNotificationType by remember { mutableStateOf(currentNotificationConfig.type) }
             var alarmClockSelected by remember { mutableStateOf(currentNotificationConfig.listenOnAlarm) }
-            var calendarSelected by remember { mutableStateOf(currentNotificationConfig.listenOnCalendar) }
+            val calendarSelected by remember { mutableStateOf(currentNotificationConfig.listenOnCalendar) }
             var ownTimeSelected by remember { mutableStateOf(currentNotificationConfig.listenOnOwnTimer) }
             val timePickerDialogState = rememberMaterialDialogState(false)
 
@@ -92,10 +93,44 @@ fun NotificationCreationModal(
                     )
                 } else mutableStateOf(true)
             }
-            val launcher = rememberLauncherForActivityResult(
+            var hasCoarseLocationPermission by remember {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    mutableStateOf(
+                        ActivityCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                    )
+                } else mutableStateOf(true)
+            }
+            var hasFineLocationPermission by remember {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    mutableStateOf(
+                        ActivityCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                    )
+                } else mutableStateOf(true)
+            }
+            val notificationLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.RequestPermission(),
                 onResult = { isGranted ->
                     hasNotificationPermission = isGranted
+                }
+            )
+            val fineLocationLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestPermission(),
+                onResult = { isGranted ->
+                    hasFineLocationPermission = isGranted
+                }
+            )
+            val coarseLocationLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestPermission(),
+                onResult = { isGranted ->
+                    hasCoarseLocationPermission = isGranted
+                    fineLocationLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+
                 }
             )
 
@@ -124,18 +159,18 @@ fun NotificationCreationModal(
                         currentNotificationConfig.listenOnOwnTimer = ownTimeSelected
                         currentNotificationConfig.type = currentNotificationType
                         if (isValidated(currentNotificationConfig)) {
-
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                notificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                if (currentNotificationConfig.type == NotificationType.WEATHER) {
+                                    coarseLocationLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                                }
                             }
                             if (hasNotificationPermission) {
                                 currentNotificationConfig.isActive = true
                             }
-                            save(currentNotificationConfig, context)
 
+                            save(currentNotificationConfig, context)
                             println("YOUR NOTIFICATION:  $currentNotificationConfig")
-                            println(currentNotificationConfig.news_category.description)
-                            println(currentNotificationConfig.news_amount)
                             IntentProvider.pendingIntentBroadcast(context, 999999, SyncScheduledNotificationsJob::class.java).send()
                             onClose()
 

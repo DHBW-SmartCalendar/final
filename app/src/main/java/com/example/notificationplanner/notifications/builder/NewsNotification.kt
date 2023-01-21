@@ -62,7 +62,7 @@ class NewsNotification : BroadcastReceiver() {
                     Log.d(this@NewsNotification::class.java.name, "Notification sent finally -> config uid : $uid")
                 } else {
                     Log.e(this@NewsNotification.javaClass.name, "Api call failure ")
-                    ExceptionNotification.default(context)
+                    ExceptionNotification.sendExceptionNotification(context)
                 }
             }
         }

@@ -46,7 +46,7 @@ class MemeNotification : BroadcastReceiver() {
                         .build()
 
                     with(NotificationManagerCompat.from(context)) {
-                        notify(1, notification)
+                        notify(3, notification)
                     }
                     Log.d(this@MemeNotification::class.java.name, "Notification sent finally -> config uid : $uid")
                 } else {

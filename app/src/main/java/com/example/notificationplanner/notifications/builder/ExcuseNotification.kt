@@ -45,7 +45,7 @@ class ExcuseNotification : BroadcastReceiver() {
                         .build()
 
                     with(NotificationManagerCompat.from(context)) {
-                        notify(1, notification)
+                        notify(4, notification)
                     }
                     Log.d(this@ExcuseNotification::class.java.name, "Notification sent finally -> config uid : $uid")
                 } else {

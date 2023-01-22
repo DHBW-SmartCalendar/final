@@ -33,7 +33,7 @@ class ExcuseNotification : BroadcastReceiver() {
 
         NotificationsConditions.check(context, uid!!) { api, config ->
             GlobalScope.launch(Dispatchers.IO) {
-                val response = api.getExcuse(config.excuses_category.toString().lowercase(), config.excuses_amount)
+                val response = api!!.getExcuse(config.excuses_category.toString().lowercase(), config.excuses_amount)
                 if (response.isSuccessful) {
                     Log.d(this@ExcuseNotification::class.java.name, "Excuse Api request was successful")
 

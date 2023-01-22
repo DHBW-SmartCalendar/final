@@ -46,6 +46,7 @@
         <receiver android:name=".notifications.builder.ExcuseNotification" />
         <receiver android:name=".notifications.builder.NewsNotification" />
         <receiver android:name=".notifications.builder.MemeNotification" />
+        <receiver android:name=".notifications.builder.CalendarNotification" />
 
         <receiver
             android:name=".jobs.OnNextAlarmClockChangedReceiver"

@@ -34,7 +34,7 @@ class WeatherNotification : BroadcastReceiver() {
             GlobalScope.launch(Dispatchers.IO) {
                 val location = LocationProvider.getLocation(context)
                 location?.let {
-                    val response = api.getWeather(lat = it.latitude, lon = it.longitude)
+                    val response = api!!.getWeather(lat = it.latitude, lon = it.longitude)
                     if (response.isSuccessful) {
                         Log.d(this@WeatherNotification::class.java.name, "Weather Api request was successful")
                         val weather = getCurrentWeather(response.body()!!)

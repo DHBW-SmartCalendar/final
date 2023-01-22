@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.example.notificationplanner.data.NotificationConfig
+import com.example.notificationplanner.data.NotificationType
 import com.example.notificationplanner.data.db.NotificationConfigRepository
 import com.example.notificationplanner.exception.ExceptionNotification
 import com.example.notificationplanner.externAPI.APIClient
@@ -17,9 +18,9 @@ import kotlinx.coroutines.launch
 import kotlin.system.measureTimeMillis
 
 class NotificationsConditions {
-    companion object{
+    companion object {
         @OptIn(DelicateCoroutinesApi::class)
-        fun check(context: Context, uid: Int, sendNotification: (APICollection, NotificationConfig) -> Unit) {
+        fun check(context: Context, uid: Int, sendNotification: (APICollection?, NotificationConfig) -> Unit) {
             GlobalScope.launch(Dispatchers.IO) {
                 if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
                     // DB request & API call
@@ -29,8 +30,12 @@ class NotificationsConditions {
                             val config = repoConfig.findById(uid)
                             if (config != null) {
                                 if (InternetConnection.check(context)) {
-                                    APIClient.request(config.type) {
-                                        sendNotification(it, config)
+                                    if (config.type == NotificationType.CALENDAR) {
+                                        sendNotification(null, config)
+                                    } else {
+                                        APIClient.request(config.type) {
+                                            sendNotification(it, config)
+                                        }
                                     }
                                 } else {
                                     Log.e("NotificationsConditions", "Internet connection not available")

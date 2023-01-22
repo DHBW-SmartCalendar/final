@@ -85,6 +85,26 @@ fun NotificationCard(
             )
         } else mutableStateOf(true)
     }
+    var hasCalendarPermission by remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            mutableStateOf(
+                ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.READ_CALENDAR
+                ) == PackageManager.PERMISSION_GRANTED
+            )
+        } else mutableStateOf(true)
+    }
+
+    val calendarLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { isGranted ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                hasNotificationPermission = isGranted[Manifest.permission.POST_NOTIFICATIONS] ?: false
+            }
+            hasCalendarPermission = isGranted[Manifest.permission.READ_CALENDAR] ?: false
+        }
+    )
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
@@ -108,9 +128,12 @@ fun NotificationCard(
             backgroundLocationLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
         }
     )
-    LaunchedEffect(notificationConfig){
-        if (notificationConfig.type == NotificationType.WEATHER && notificationConfig.isActive){
+    LaunchedEffect(notificationConfig) {
+        if (notificationConfig.type == NotificationType.WEATHER && notificationConfig.isActive) {
             backgroundLocationLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+        if (notificationConfig.type == NotificationType.CALENDAR && notificationConfig.isActive) {
+            calendarLauncher.launch(arrayOf(Manifest.permission.READ_CALENDAR))
         }
     }
 
@@ -156,16 +179,27 @@ fun NotificationCard(
                 checked = isChecked,
                 onCheckedChange = {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        if (notificationConfig.type == NotificationType.WEATHER) {
-                            locationPermissionsLauncher.launch(
-                                arrayOf(
-                                    Manifest.permission.POST_NOTIFICATIONS,
-                                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                                    Manifest.permission.ACCESS_FINE_LOCATION,
+                        when (notificationConfig.type) {
+                            NotificationType.WEATHER -> {
+                                locationPermissionsLauncher.launch(
+                                    arrayOf(
+                                        Manifest.permission.POST_NOTIFICATIONS,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                    )
                                 )
-                            )
-                        } else {
-                            launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            }
+                            NotificationType.CALENDAR -> {
+                                calendarLauncher.launch(
+                                    arrayOf(
+                                        Manifest.permission.POST_NOTIFICATIONS,
+                                        Manifest.permission.READ_CALENDAR,
+                                    )
+                                )
+                            }
+                            else -> {
+                                launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            }
                         }
                     }
                     if (hasNotificationPermission) {

@@ -30,7 +30,7 @@ class NewsNotification : BroadcastReceiver() {
 
         NotificationsConditions.check(context, uid!!) { api, config ->
             GlobalScope.launch(Dispatchers.IO) {
-                val response = api.getNews(config.news_category.toString().lowercase(), config.news_country.str)
+                val response = api!!.getNews(config.news_category.toString().lowercase(), config.news_country.str)
                 println("AFTER RESPONSE, RESPONSE is: " + response)
                 if (response.isSuccessful) {
                     Log.d(this@NewsNotification::class.java.name, "News Api request was successful")

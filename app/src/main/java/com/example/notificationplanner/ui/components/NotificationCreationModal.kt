@@ -125,6 +125,26 @@ fun NotificationCreationModal(
                     )
                 } else mutableStateOf(true)
             }
+            var hasCalendarPermission by remember {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    mutableStateOf(
+                        ActivityCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.READ_CALENDAR
+                        ) == PackageManager.PERMISSION_GRANTED
+                    )
+                } else mutableStateOf(true)
+            }
+
+            val calendarLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestMultiplePermissions(),
+                onResult = { isGranted ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        hasNotificationPermission = isGranted[Manifest.permission.POST_NOTIFICATIONS] ?: false
+                    }
+                    hasCalendarPermission = isGranted[Manifest.permission.READ_CALENDAR] ?: false
+                }
+            )
             val launcher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.RequestPermission(),
                 onResult = { isGranted ->
@@ -176,16 +196,27 @@ fun NotificationCreationModal(
                         currentNotificationConfig.type = currentNotificationType
                         if (isValidated(currentNotificationConfig)) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                if (currentNotificationConfig.type == NotificationType.WEATHER) {
-                                    locationPermissionsLauncher.launch(
-                                        arrayOf(
-                                            Manifest.permission.POST_NOTIFICATIONS,
-                                            Manifest.permission.ACCESS_COARSE_LOCATION,
-                                            Manifest.permission.ACCESS_FINE_LOCATION,
+                                when (currentNotificationConfig.type) {
+                                    NotificationType.WEATHER -> {
+                                        locationPermissionsLauncher.launch(
+                                            arrayOf(
+                                                Manifest.permission.POST_NOTIFICATIONS,
+                                                Manifest.permission.ACCESS_COARSE_LOCATION,
+                                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                            )
                                         )
-                                    )
-                                } else {
-                                    launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                    }
+                                    NotificationType.CALENDAR -> {
+                                        calendarLauncher.launch(
+                                            arrayOf(
+                                                Manifest.permission.POST_NOTIFICATIONS,
+                                                Manifest.permission.READ_CALENDAR,
+                                            )
+                                        )
+                                    }
+                                    else -> {
+                                        launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                    }
                                 }
                             }
                             if (hasNotificationPermission) {
@@ -370,7 +401,7 @@ fun NotificationCreationModal(
                         when (currentNotificationType) {
                             NotificationType.WEATHER -> WeatherForm(currentNotificationConfig)
                             NotificationType.NEWS -> NewsForm(currentNotificationConfig)
-                            NotificationType.CALENDAR -> CalendarForm()
+                            NotificationType.CALENDAR -> CalendarForm(currentNotificationConfig)
                             NotificationType.MEME -> MemeForm(currentNotificationConfig)
                             NotificationType.EXCUSE -> ExcusesForm(currentNotificationConfig)
                         }

@@ -34,7 +34,7 @@ class MemeNotification : BroadcastReceiver() {
 
         NotificationsConditions.check(context, uid!!) { api, config ->
             GlobalScope.launch(Dispatchers.IO) {
-                val response = api.getMeme(1)
+                val response = api!!.getMeme(1)
                 if (response.isSuccessful) {
                     Log.d(this@MemeNotification::class.java.name, "News Api request was successful")
 

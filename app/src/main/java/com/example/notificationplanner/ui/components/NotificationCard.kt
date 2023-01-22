@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -34,6 +35,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun NotificationCard(
     modifier: Modifier = Modifier,
@@ -41,6 +43,7 @@ fun NotificationCard(
     onEditRequest: () -> Unit
 ) {
     val context = LocalContext.current
+
 
     var hasNotificationPermission by remember {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -88,26 +91,28 @@ fun NotificationCard(
             hasNotificationPermission = isGranted
         }
     )
-    val fineLocationLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            hasFineLocationPermission = isGranted
-        }
-    )
-    val coarseLocationLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            hasCoarseLocationPermission = isGranted
-            fineLocationLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-
-        }
-    )
     val backgroundLocationLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
             hasBackgroundLocationPermission = isGranted
         }
     )
+    val locationPermissionsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { isGranted ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                hasNotificationPermission = isGranted[Manifest.permission.POST_NOTIFICATIONS] ?: false
+            }
+            hasCoarseLocationPermission = isGranted[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
+            hasFineLocationPermission = isGranted[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+            backgroundLocationLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+    )
+    LaunchedEffect(notificationConfig){
+        if (notificationConfig.type == NotificationType.WEATHER && notificationConfig.isActive){
+            backgroundLocationLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+    }
 
     ElevatedCard(
         modifier = Modifier
@@ -151,10 +156,16 @@ fun NotificationCard(
                 checked = isChecked,
                 onCheckedChange = {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
                         if (notificationConfig.type == NotificationType.WEATHER) {
-                            coarseLocationLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
-                            backgroundLocationLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                            locationPermissionsLauncher.launch(
+                                arrayOf(
+                                    Manifest.permission.POST_NOTIFICATIONS,
+                                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                                    Manifest.permission.ACCESS_FINE_LOCATION,
+                                )
+                            )
+                        } else {
+                            launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
                         }
                     }
                     if (hasNotificationPermission) {

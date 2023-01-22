@@ -61,7 +61,7 @@ class WeatherNotification : BroadcastReceiver() {
                     }
                 } ?: run {
                     Log.e(this@WeatherNotification.javaClass.name, "Location Detection Failure ")
-                    ExceptionNotification.sendExceptionNotification(context, "PLease check your permissions regarding location tracking")
+                    ExceptionNotification.sendExceptionNotification(context, "PLease check your permissions regarding location tracking. \n To get precise weather information's, you need to grant location tracking also while the app is in the background.")
                 }
             }
         }

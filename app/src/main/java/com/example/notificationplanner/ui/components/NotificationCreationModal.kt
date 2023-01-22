@@ -9,6 +9,7 @@ import android.os.Build
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,6 +47,7 @@ import kotlinx.coroutines.*
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationCreationModal(
@@ -113,26 +115,40 @@ fun NotificationCreationModal(
                     )
                 } else mutableStateOf(true)
             }
-            val notificationLauncher = rememberLauncherForActivityResult(
+            var hasBackgroundLocationPermission by remember {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    mutableStateOf(
+                        ActivityCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                    )
+                } else mutableStateOf(true)
+            }
+            val launcher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.RequestPermission(),
                 onResult = { isGranted ->
                     hasNotificationPermission = isGranted
                 }
             )
-            val fineLocationLauncher = rememberLauncherForActivityResult(
+            val backgroundLocationLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.RequestPermission(),
                 onResult = { isGranted ->
-                    hasFineLocationPermission = isGranted
+                    hasBackgroundLocationPermission = isGranted
                 }
             )
-            val coarseLocationLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.RequestPermission(),
+            val locationPermissionsLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestMultiplePermissions(),
                 onResult = { isGranted ->
-                    hasCoarseLocationPermission = isGranted
-                    fineLocationLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        hasNotificationPermission = isGranted[Manifest.permission.POST_NOTIFICATIONS] ?: false
+                    }
+                    hasCoarseLocationPermission = isGranted[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
+                    hasFineLocationPermission = isGranted[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+                    backgroundLocationLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                }
+            )
 
-                }
-            )
 
             Column(
                 modifier = Modifier
@@ -160,9 +176,16 @@ fun NotificationCreationModal(
                         currentNotificationConfig.type = currentNotificationType
                         if (isValidated(currentNotificationConfig)) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                notificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                                 if (currentNotificationConfig.type == NotificationType.WEATHER) {
-                                    coarseLocationLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                                    locationPermissionsLauncher.launch(
+                                        arrayOf(
+                                            Manifest.permission.POST_NOTIFICATIONS,
+                                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                                            Manifest.permission.ACCESS_FINE_LOCATION,
+                                        )
+                                    )
+                                } else {
+                                    launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
                                 }
                             }
                             if (hasNotificationPermission) {

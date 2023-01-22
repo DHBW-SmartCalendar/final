@@ -39,7 +39,7 @@ class MemeNotification : BroadcastReceiver() {
                     Log.d(this@MemeNotification::class.java.name, "News Api request was successful")
 
                     val notification = NotificationCompat.Builder(context, NotificationService.PLANNER_CHANNEL_ID)
-                        .setSmallIcon(R.drawable.img_da)
+                        .setSmallIcon(R.drawable.keiho_icon)
                         .setContentTitle("Meme")
                         .setStyle(NotificationCompat.BigPictureStyle().bigPicture(getMemePicture(response.body()!!, context)))
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -60,7 +60,7 @@ class MemeNotification : BroadcastReceiver() {
 
     private suspend fun getMemePicture(meme: Meme, context: Context): Bitmap {
         val loading = ImageLoader(context)
-        val request = ImageRequest.Builder(context).data("${meme.memes[0].url}").build()
+        val request = ImageRequest.Builder(context).data(meme.memes[0].url).build()
         val result = (loading.execute(request) as SuccessResult).drawable
         return (result as BitmapDrawable).bitmap
     }

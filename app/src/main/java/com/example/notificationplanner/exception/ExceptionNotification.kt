@@ -12,8 +12,8 @@ class ExceptionNotification {
     companion object {
         private fun create(title: String, msg: String, context: Context): Notification {
             return NotificationCompat.Builder(context, NotificationService.PLANNER_CHANNEL_ID)
-                //TODO replace with final icon
-                .setSmallIcon(R.drawable.img_da)
+
+                .setSmallIcon(R.drawable.keiho_icon)
                 //.setLargeIcon(Bitmap.createBitmap())
                 .setContentTitle(title)
                 .setContentText(msg)
@@ -23,8 +23,7 @@ class ExceptionNotification {
 
         private fun default(context: Context) : Notification {
             return NotificationCompat.Builder(context, NotificationService.PLANNER_CHANNEL_ID)
-                //TODO replace with final icon
-                .setSmallIcon(R.drawable.img_da)
+                .setSmallIcon(R.drawable.keiho_icon)
                 //.setLargeIcon(Bitmap.createBitmap())
                 .setContentTitle("Fail")
                 .setContentText("Something went wrong")

@@ -41,7 +41,7 @@ class WeatherNotification : BroadcastReceiver() {
 
                         weather?.let {
                             val notification = NotificationCompat.Builder(context, NotificationService.PLANNER_CHANNEL_ID)
-                                .setSmallIcon(R.drawable.img_da)
+                                .setSmallIcon(R.drawable.keiho_icon)
                                 //.setLargeIcon(Bitmap.createBitmap())
                                 .setContentTitle("Weather")
                                 .setStyle(NotificationCompat.BigTextStyle().bigText(getWeatherString(config, weather)))

@@ -1,10 +1,10 @@
 package com.example.notificationplanner.ui.form
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.notificationplanner.data.NotificationConfig
 import com.google.accompanist.flowlayout.FlowRow
@@ -14,13 +14,21 @@ import com.google.accompanist.flowlayout.SizeMode
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherForm(
-    notificationConfig: NotificationConfig
+    notificationConfig: NotificationConfig,
+    modifier: Modifier = Modifier
 ) {
-    val filterChipColorScheme = FilterChipDefaults.filterChipColors(
-        containerColor = MaterialTheme.colorScheme.primary
+    val colorDefault = FilterChipDefaults.filterChipColors(
+        containerColor = MaterialTheme.colorScheme.secondary,
+        selectedContainerColor = MaterialTheme.colorScheme.onSecondary
+    )
+    val borderDefault = FilterChipDefaults.filterChipBorder(
+        selectedBorderColor = Color.Black,
+        selectedBorderWidth = 1.dp,
+        borderColor = MaterialTheme.colorScheme.onSecondary,
+        borderWidth = 2.dp
     )
 
-    val modifier = Modifier
+    val filterChipModifier = Modifier
 
     var temperature by remember { mutableStateOf(notificationConfig.weather_temperature) }
     var cloudCover by remember { mutableStateOf(notificationConfig.weather_cloud_cover) }
@@ -32,14 +40,13 @@ fun WeatherForm(
     var windDirection by remember { mutableStateOf(notificationConfig.weather_wind_direction) }
     var windSpeed by remember { mutableStateOf(notificationConfig.weather_wind_speed) }
 
-    Column(modifier = Modifier.padding(10.dp)) {
+    Column(modifier = modifier) {
 
-        Text(text = "Weather Form")
         FlowRow(
             mainAxisAlignment = MainAxisAlignment.Start,
             mainAxisSize = SizeMode.Expand,
             crossAxisSpacing = 2.dp,
-            mainAxisSpacing = 6.dp
+            mainAxisSpacing = 4.dp
         ) {
 
 
@@ -48,112 +55,110 @@ fun WeatherForm(
                     temperature = !temperature
                     notificationConfig.weather_temperature = temperature
                 },
-                modifier = modifier,
+                modifier = filterChipModifier,
                 label = {
                     Text(text = "Temperature")
                 },
                 selected = temperature,
-                colors = filterChipColorScheme
-            )
+                colors = colorDefault, border = borderDefault,
+
+                )
             FilterChip(
                 onClick = {
                     sunshine = !sunshine
                     notificationConfig.weather_sunshine = sunshine
                 },
-                modifier = modifier,
+                modifier = filterChipModifier,
                 label = {
                     Text(text = "Sunshine ")
                 },
                 selected = sunshine,
-                colors = filterChipColorScheme
+                colors = colorDefault, border = borderDefault
             )
             FilterChip(
                 onClick = {
                     precipitation = !precipitation
                     notificationConfig.weather_precipitation = precipitation
                 },
-                modifier = modifier,
+                modifier = filterChipModifier,
                 label = {
                     Text(text = "Precipitation")
                 },
                 selected = precipitation,
-                colors = filterChipColorScheme
+                colors = colorDefault, border = borderDefault
             )
             FilterChip(
                 onClick = {
                     cloudCover = !cloudCover
                     notificationConfig.weather_cloud_cover = cloudCover
                 },
-                modifier = modifier,
+                modifier = filterChipModifier,
                 label = {
                     Text(text = "Cloud over ")
                 },
                 selected = cloudCover,
-                colors = filterChipColorScheme
+                colors = colorDefault, border = borderDefault
             )
             FilterChip(
                 onClick = {
                     dewPoint = !dewPoint
                     notificationConfig.weather_dew_point = dewPoint
                 },
-                modifier = modifier,
+                modifier = filterChipModifier,
                 label = {
                     Text(text = "Dew point")
                 },
                 selected = dewPoint,
-                colors = filterChipColorScheme
+                colors = colorDefault, border = borderDefault
             )
             FilterChip(
                 onClick = {
                     visibility = !visibility
                     notificationConfig.weather_visibility = visibility
                 },
-                modifier = modifier,
+                modifier = filterChipModifier,
                 label = {
                     Text(text = "Visibility")
                 },
                 selected = visibility,
-                colors = filterChipColorScheme
+                colors = colorDefault, border = borderDefault
             )
             FilterChip(
                 onClick = {
                     relativeHumidity = !relativeHumidity
                     notificationConfig.weather_relative_humidity = relativeHumidity
                 },
-                modifier = modifier,
+                modifier = filterChipModifier,
                 label = {
                     Text(text = "Relative humidity")
                 },
                 selected = relativeHumidity,
-                colors = filterChipColorScheme
+                colors = colorDefault, border = borderDefault
             )
             FilterChip(
                 onClick = {
                     windDirection = !windDirection
                     notificationConfig.weather_wind_direction = windDirection
                 },
-                modifier = modifier,
+                modifier = filterChipModifier,
                 label = {
                     Text(text = "Wind direction ")
                 },
                 selected = windDirection,
-                colors = filterChipColorScheme
+                colors = colorDefault, border = borderDefault
             )
             FilterChip(
                 onClick = {
                     windSpeed = !windSpeed
                     notificationConfig.weather_wind_speed = windSpeed
                 },
-                modifier = modifier,
+                modifier = filterChipModifier,
                 label = {
                     Text(text = "Wind speed")
                 },
                 selected = windSpeed,
-                colors = filterChipColorScheme
+                colors = colorDefault, border = borderDefault
             )
-
         }
     }
-
-
 }

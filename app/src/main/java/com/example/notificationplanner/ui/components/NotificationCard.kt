@@ -6,8 +6,8 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,9 +21,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.notificationplanner.R
 import com.example.notificationplanner.data.NotificationConfig
+import com.example.notificationplanner.data.NotificationType
 import com.example.notificationplanner.data.db.NotificationConfigRepository
 import com.example.notificationplanner.jobs.SyncScheduledNotificationsJob
 import com.example.notificationplanner.utils.IntentProvider
@@ -31,10 +33,9 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun NotificationCard(
     modifier: Modifier = Modifier,
@@ -42,6 +43,7 @@ fun NotificationCard(
     onEditRequest: () -> Unit
 ) {
     val context = LocalContext.current
+
 
     var hasNotificationPermission by remember {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -53,25 +55,101 @@ fun NotificationCard(
             )
         } else mutableStateOf(true)
     }
+    var hasCoarseLocationPermission by remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            mutableStateOf(
+                ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            )
+        } else mutableStateOf(true)
+    }
+    var hasFineLocationPermission by remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            mutableStateOf(
+                ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            )
+        } else mutableStateOf(true)
+    }
+    var hasBackgroundLocationPermission by remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            mutableStateOf(
+                ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            )
+        } else mutableStateOf(true)
+    }
+    var hasCalendarPermission by remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            mutableStateOf(
+                ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.READ_CALENDAR
+                ) == PackageManager.PERMISSION_GRANTED
+            )
+        } else mutableStateOf(true)
+    }
+
+    val calendarLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { isGranted ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                hasNotificationPermission = isGranted[Manifest.permission.POST_NOTIFICATIONS] ?: false
+            }
+            hasCalendarPermission = isGranted[Manifest.permission.READ_CALENDAR] ?: false
+        }
+    )
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
             hasNotificationPermission = isGranted
         }
     )
-
+    val backgroundLocationLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            hasBackgroundLocationPermission = isGranted
+        }
+    )
+    val locationPermissionsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { isGranted ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                hasNotificationPermission = isGranted[Manifest.permission.POST_NOTIFICATIONS] ?: false
+            }
+            hasCoarseLocationPermission = isGranted[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
+            hasFineLocationPermission = isGranted[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+            backgroundLocationLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+    )
+    LaunchedEffect(notificationConfig) {
+        if (notificationConfig.type == NotificationType.WEATHER && notificationConfig.isActive) {
+            backgroundLocationLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+        if (notificationConfig.type == NotificationType.CALENDAR && notificationConfig.isActive) {
+            calendarLauncher.launch(arrayOf(Manifest.permission.READ_CALENDAR))
+        }
+    }
 
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth(0.9f)
             .then(modifier),
+        shape = RoundedCornerShape(20),
 
         colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = MaterialTheme.colorScheme.secondary,
         ),
         elevation = CardDefaults.elevatedCardElevation(
             defaultElevation = 20.dp,
-            hoveredElevation = 25.dp
+            hoveredElevation = 25.dp,
+            pressedElevation = 30.dp
         )
     ) {
 
@@ -85,45 +163,71 @@ fun NotificationCard(
             horizontalArrangement = Arrangement.End
         ) {
             Text(
-                text = configState.type?.description!!,
+                text = configState.type.description + " "
+                        + when (configState.type) {
+                    NotificationType.NEWS -> configState.news_category.getLabelText()
+                    else -> {
+                        " "
+                    }
+                },
                 modifier = Modifier
-                    .padding(20.dp)
+                    .padding(15.dp)
                     .weight(4f),
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.Black
+                style = MaterialTheme.typography.displayMedium,
             )
             Switch(
                 checked = isChecked,
                 onCheckedChange = {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        when (notificationConfig.type) {
+                            NotificationType.WEATHER -> {
+                                locationPermissionsLauncher.launch(
+                                    arrayOf(
+                                        Manifest.permission.POST_NOTIFICATIONS,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                    )
+                                )
+                            }
+                            NotificationType.CALENDAR -> {
+                                calendarLauncher.launch(
+                                    arrayOf(
+                                        Manifest.permission.POST_NOTIFICATIONS,
+                                        Manifest.permission.READ_CALENDAR,
+                                    )
+                                )
+                            }
+                            else -> {
+                                launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            }
+                        }
                     }
                     if (hasNotificationPermission) {
                         isChecked = it
                         configState.isActive = isChecked
                         saveActivation(configState, context)
-                        IntentProvider.pendingIntentBroadCast(context, 999999, SyncScheduledNotificationsJob::class.java).send()
+                        IntentProvider.pendingIntentBroadcast(context, 999999, SyncScheduledNotificationsJob::class.java).send()
                     }
                 },
                 modifier = Modifier
-                    .padding(5.dp)
+                    .padding(top = 6.dp, end = 6.dp)
                     .weight(1f),
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = Color(0xFFFFFEFE),
-                    checkedTrackColor = Color(0xFF2DD158),
-                    checkedBorderColor = Color(0xFF2DD158),
                     uncheckedThumbColor = Color(0xFFFFFEFE),
-                    uncheckedTrackColor = if (isSystemInDarkTheme()) Color(0xFF393A3D) else Color(0xFFE8E9EB),
-                    uncheckedBorderColor = if (isSystemInDarkTheme()) Color(0xFF393A3D) else Color(0xFFE8E9EB)
+                    checkedTrackColor = MaterialTheme.colorScheme.onSecondary,
+                    uncheckedTrackColor = Color(0xFF9E948D),
+                    checkedBorderColor = MaterialTheme.colorScheme.onSecondary,
+                    uncheckedBorderColor = Color(0xFF9E948D)
                 )
             )
 
 
         }
-        Divider(thickness = 1.dp, modifier = Modifier.padding(start = 10.dp, end = 10.dp))
+        Divider(thickness = 2.dp, modifier = Modifier.padding(start = 10.dp, end = 100.dp), color = Color.White)
         LazyRow(
             modifier = Modifier
-                .padding(10.dp)
+                .padding(top = 10.dp, bottom = 12.dp, start = 12.dp, end = 12.dp)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.Bottom
@@ -133,10 +237,10 @@ fun NotificationCard(
             item {
                 IconButton(
                     onClick = { onEditRequest() }, modifier = Modifier
-                        .border(1.dp, Color.Gray, RoundedCornerShape(20))
+                        .border(1.dp, Color.White, RoundedCornerShape(20))
                         .size(35.dp, 35.dp)
                 ) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = null, tint = Color.Gray)
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = null, tint = Color.White)
 
                 }
 
@@ -145,21 +249,14 @@ fun NotificationCard(
                 if (configState.listenOnOwnTimer && configState.timerTime != null) DigitalClock(
                     time = configState.timerTime!!,
                     height = 25,
-                    modifier = Modifier.padding(bottom = 2.dp)
+                    //modifier = Modifier.padding(bottom = 2.dp)
                 )
                 if (configState.listenOnAlarm) Icon(
                     painter = painterResource(id = R.drawable.alarm), contentDescription = null,
                     modifier = Modifier
-                        .size(30.dp, 30.dp)
-                        .padding(start = 10.dp),
-                    tint = Color.Black
-                )
-                if (configState.listenOnCalendar) Icon(
-                    painter = painterResource(id = R.drawable.calendar), contentDescription = null,
-                    modifier = Modifier
-                        .size(30.dp, 30.dp)
-                        .padding(start = 10.dp),
-                    tint = Color.Black
+                        .size(32.dp, 32.dp)
+                        .padding(start = 10.dp, top = 4.dp),
+                    tint = Color.White
                 )
             }
         }

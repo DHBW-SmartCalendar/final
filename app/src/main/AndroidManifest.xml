@@ -5,29 +5,27 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
-    <uses-permission android:name="android.permission.READ_CALENDAR"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <application
         android:name=".App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher_da"
-        android:roundIcon="@mipmap/ic_launcher_da_round"
+        android:icon="@mipmap/keiho_icon_1"
+        android:label="KEIHO"
+        android:roundIcon="@mipmap/keiho_icon_1_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NotificationPlanner"
-        android:label="NPlanner"
-        tools:targetApi="33">
-        <activity
-            android:name=".SecondActivity"
-            android:exported="false"
-            android:label="@string/title_activity_test"
-            android:theme="@style/Theme.NotificationPlanner">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
+        android:usesCleartextTraffic="true"
+        tools:targetApi="tiramisu">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -41,18 +39,32 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+
+
         <receiver android:name=".jobs.SyncScheduledNotificationsJob" />
         <receiver android:name=".notifications.builder.WeatherNotification" />
+        <receiver android:name=".notifications.builder.ExcuseNotification" />
+        <receiver android:name=".notifications.builder.NewsNotification" />
+        <receiver android:name=".notifications.builder.MemeNotification" />
+        <receiver android:name=".notifications.builder.CalendarNotification" />
+
         <receiver
-            android:name=".jobs.OnNextAlarmClockChangedReveiver"
+            android:name=".jobs.OnNextAlarmClockChangedReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.app.action.ACTION_NEXT_ALARM_CLOCK_CHANGED" />
+                <action android:name="android.app.action.NEXT_ALARM_CLOCK_CHANGED" />
             </intent-filter>
         </receiver>
-        <service android:enabled="true" android:name=".jobs.OnNextAlarmClockChangedService" />
+
+        <receiver
+            android:name=".jobs.OnBootCompletedReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
     </application>
-
 </manifest>

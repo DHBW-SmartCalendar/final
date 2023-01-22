@@ -2,10 +2,11 @@
 
 package com.example.notificationplanner
 
-import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,16 +23,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.example.notificationplanner.data.NotificationConfig
 import com.example.notificationplanner.data.db.NotificationConfigRepository
-import com.example.notificationplanner.jobs.SyncScheduledNotificationsJob
-import com.example.notificationplanner.utils.IntentProvider
 import com.example.notificationplanner.ui.components.NotificationCard
 import com.example.notificationplanner.ui.components.NotificationCreationModal
 import com.example.notificationplanner.ui.theme.NotificationPlannerTheme
-import com.example.notificationplanner.utils.CalendarProvider
 import kotlinx.coroutines.*
 
 class MainActivity : ComponentActivity() {
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -70,7 +69,7 @@ class MainActivity : ComponentActivity() {
                     Scaffold(
                         floatingActionButton = {
                             FloatingActionButton(
-                                containerColor = MaterialTheme.colorScheme.tertiary,
+                                containerColor = MaterialTheme.colorScheme.onSecondary,
                                 onClick = {
                                     createDialogIsOpen = true
                                 },
@@ -85,10 +84,10 @@ class MainActivity : ComponentActivity() {
                         topBar = {
                             CenterAlignedTopAppBar(
                                 title = {
-                                    Text(text = "Planner")
+                                    Text(text = "KEIHO", style= MaterialTheme.typography.headlineLarge)
                                 },
                                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                                    containerColor = MaterialTheme.colorScheme.tertiary,
+                                    containerColor = MaterialTheme.colorScheme.onSecondary,
                                     titleContentColor = Color.White
                                 ),
                                 modifier = Modifier.height(40.dp)
@@ -109,38 +108,15 @@ class MainActivity : ComponentActivity() {
                                         editing = it
                                     })
                                 }
-
-                                // testing
-                                item {
-                                    Button(onClick = {
-                                        val notificationIntent = Intent(context, SyncScheduledNotificationsJob::class.java)
-                                       IntentProvider.pendingIntentBroadCast(context, 99, notificationIntent).send()
-                                    }) {
-                                        Text(text = "test test test")
-                                    }
-                                }
-                                item {
-                                    //Just for Testing Calendar ReadOut, delete this button later
-                                    Button(
-                                        onClick = {
-                                            val c = CalendarProvider()
-                                            c.checkPermissionAndReadCalendar(activity)
-                                        },
-                                    ) {
-                                        Text(text = "Press to Log Calendar Events")
-                                    }
-                                }
                             }
-
-
-
 
                             if (createDialogIsOpen) NotificationCreationModal(
                                 onClose = {
                                     createDialogIsOpen = false
                                     isSynced = false
                                 },
-                                notificationConfig = null
+                                notificationConfig = null,
+                                isEditing = false
                             )
 
                             if (editDialogIsOpen) NotificationCreationModal(
@@ -148,7 +124,8 @@ class MainActivity : ComponentActivity() {
                                     editing = null
                                     isSynced = false
                                 },
-                                notificationConfig = editing
+                                notificationConfig = editing,
+                                isEditing = true
                             )
                         } else {
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -172,7 +149,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        println("destroy ++++++++++++++++++++++++++++++++")
+        println("destroyed ++++++++++++++++++++++++++++++++")
     }
 
 }

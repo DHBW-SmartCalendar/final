@@ -71,6 +71,8 @@ dependencies {
     implementation "io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc"
     implementation "androidx.work:work-runtime-ktx:2.7.1"
 
+    implementation "io.coil-kt:coil-compose:2.2.2"
+
     implementation "androidx.room:room-runtime:2.4.3"
     implementation "androidx.room:room-ktx:2.4.3"
     annotationProcessor "androidx.room:room-compiler:2.4.3"

@@ -11,18 +11,12 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = DarkBlue,
-    secondary = LightBlue,
-    tertiary = Light,
-    background = DarkGray,
 
-
-    )
 
 private val LightColorScheme = lightColorScheme(
     primary = LightBlue,
-    secondary = Blue20,
+    secondary = orange_bg,
+    onSecondary = orange_dark,
     tertiary = Grey20,
     background = Light
 
@@ -36,6 +30,7 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color(0xFF1C1B1F),
     */
 )
+private val DarkColorScheme = LightColorScheme
 
 @Composable
 fun NotificationPlannerTheme(
@@ -57,7 +52,7 @@ fun NotificationPlannerTheme(
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            (view.context as Activity).window.statusBarColor = colorScheme.tertiary.toArgb()
+            (view.context as Activity).window.statusBarColor = colorScheme.onSecondary.toArgb()
             ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
         }
     }

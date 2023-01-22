@@ -1,13 +1,50 @@
 package com.example.notificationplanner.ui.form
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.example.notificationplanner.data.Country
+import com.example.notificationplanner.data.NotificationConfig
+import com.example.notificationplanner.externAPI.json.news.NewsCategory
+import com.example.notificationplanner.ui.components.DropDownMenu
 
 @Composable
-fun NewsForm() {
-    Text(text = "NewsForm")
-    // TODO Heading
-// TODO first do todo 1 in NotificationConfig Class (the enum needs to implement DropDownCompatible interface)
-// TODO implement Dropdown for news topic (use States / on change : updating of data object is required) use NotificationType DropDown in NotificationCreationModal as Reference
-// TODO implement slider for article amount ->(use States / on change : updating of data object is required) use WeatherForm as reference
+fun NewsForm(notificationConfig: NotificationConfig) {
+
+    var category by remember { mutableStateOf(notificationConfig.news_category) }
+    var country by remember { mutableStateOf(notificationConfig.news_country) }
+    var sliderPosition by remember { mutableStateOf(notificationConfig.news_amount.toFloat()) }
+
+    Column {
+
+        Text(text = "Category", modifier = Modifier.align(alignment = Alignment.CenterHorizontally), color = Color.Black)
+        DropDownMenu(modifier = Modifier.padding(bottom = 10.dp, top = 5.dp), items = NewsCategory.values().asList(), onSelectionChanged = {
+            category = it
+            notificationConfig.news_category = category
+        }, selected = notificationConfig.news_category)
+        Text(text = "Country", modifier = Modifier.align(alignment = Alignment.CenterHorizontally), color = Color.Black)
+        DropDownMenu(modifier = Modifier.padding(bottom = 10.dp, top = 5.dp), items = Country.values().asList(), onSelectionChanged = {
+            country = it
+            notificationConfig.news_country = country
+        }, selected = notificationConfig.news_country)
+
+        Text(text = "Article amount", modifier = Modifier.align(alignment = Alignment.CenterHorizontally), color = Color.Black)
+        Slider(
+            value = sliderPosition,
+            modifier = Modifier.padding(start = 15.dp, end = 15.dp, top = 8.dp),
+            valueRange = 1f..3f,
+            steps = 1,
+            onValueChange = { sliderPosition = it; notificationConfig.news_amount = it.toInt() },
+            colors = SliderDefaults.colors(MaterialTheme.colorScheme.onSecondary)
+        )
+        Text(text = sliderPosition.toInt().toString(), modifier = Modifier.align(alignment = Alignment.CenterHorizontally))
+    }
 }

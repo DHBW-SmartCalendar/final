@@ -1,5 +1,6 @@
 package com.example.notificationplanner.exception
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.content.Context
 import androidx.core.app.NotificationCompat
@@ -9,27 +10,29 @@ import com.example.notificationplanner.notifications.NotificationService
 
 class ExceptionNotification {
     companion object {
-        fun create(title: String, msg: String, context: Context): Notification {
+        private fun create(title: String, msg: String, context: Context): Notification {
             return NotificationCompat.Builder(context, NotificationService.PLANNER_CHANNEL_ID)
-                //TODO replace with final icon
-                .setSmallIcon(R.drawable.img_da)
+
+                .setSmallIcon(R.drawable.keiho_icon)
                 //.setLargeIcon(Bitmap.createBitmap())
                 .setContentTitle(title)
                 .setContentText(msg)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build()
         }
-        fun default(context: Context) :  Notification{
+
+        private fun default(context: Context) : Notification {
             return NotificationCompat.Builder(context, NotificationService.PLANNER_CHANNEL_ID)
-                //TODO replace with final icon
-                .setSmallIcon(R.drawable.img_da)
+                .setSmallIcon(R.drawable.keiho_icon)
                 //.setLargeIcon(Bitmap.createBitmap())
                 .setContentTitle("Fail")
                 .setContentText("Something went wrong")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build()
         }
-        fun sendExceptionNotification(context: Context, msg: String? = null ) {
+
+        @SuppressLint("MissingPermission")
+        fun sendExceptionNotification(context: Context, msg: String? = null) {
             val notification = if (msg != null) {
                 create(
                     "Fail",
